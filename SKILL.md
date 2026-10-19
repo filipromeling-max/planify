@@ -3,12 +3,12 @@ name: planify
 description: "Create validated project plans and project structures as explorable standalone HTML: an overview with goal, scope and success criteria; a Gantt roadmap with dependencies, milestones and the computed critical path; a work breakdown structure, project organisation and governance; a RACI matrix with workload; and a risk heat map and register. Dark/light themes, print/PDF, PNG/SVG roadmap, Markdown and CSV export. Use when the user asks to plan a project, programme, migration, launch, engagement or event; to build a roadmap, timeline, Gantt, WBS, RACI, project charter, governance model or risk register; or to turn notes, a brief, a statement of work or a Jira/Notion export into a plan. Not for architecture or system diagrams (use archify) or live trackers."
 license: MIT
 metadata:
-  version: "1.0"
+  version: "1.1"
 ---
 
 # Planify
 
-Turn a project description into one checked, standalone HTML plan. You write a JSON candidate; the CLI validates it, schedules it (working-day calendar, FS/SS/FF dependencies, critical path), renders it and checks the artifact.
+Turn a project description into one checked, standalone HTML plan, and keep it true while the project runs. You write a JSON candidate; the CLI validates it, schedules it (working-day calendar, FS/SS/FF dependencies, critical path), renders it and checks the artifact.
 
 Run commands from the user's working directory. Replace `bin/planify.mjs` in every command with this skill's absolute path to it. Unless the user names a location, give each new plan its own folder `.planify/<slug>-<YYYYMMDD-HHMMSS>/` (local time, chosen once) holding `candidate.plan.json` and `<slug>.html`, and set `meta.output` to that HTML path relative to the working directory. Reuse the folder for repairs and revisions of the same plan.
 
@@ -55,7 +55,7 @@ After three failed repair rounds on the same error, stop and report it with the 
 
 ## 4. Revisions
 
-For a change request ("move UAT a week", "add a data workstream", "Kim is now on the migration"), edit the existing candidate and rerun `finalize` to the same output. Update `status` and `progress` on tasks and `achieved` on milestones for progress reports; set `meta.today` only when the user wants the plan shown as of a specific date.
+For a change request ("move UAT a week", "add a data workstream", "Kim is now on the migration"), edit the existing candidate and rerun `finalize` to the same output. For progress, once the plan has a baseline, follow Tracking progress below instead. Set `meta.today` only when the user wants the plan shown as of a specific date.
 
 Other commands:
 
@@ -64,6 +64,34 @@ node bin/planify.mjs validate <candidate.plan.json>          # check and schedul
 node bin/planify.mjs export md <candidate.plan.json> [out]   # Markdown summary for Confluence, Notion, email
 node bin/planify.mjs export csv <candidate.plan.json> [out]  # task list for Excel, Jira or MS Project import
 ```
+
+## 5. Tracking progress
+
+A plan is not static. Once the sponsor agrees the plan, freeze it:
+
+```bash
+node bin/planify.mjs baseline <folder>/candidate.plan.json --label "Approved at kick-off"
+```
+
+From then on the plan is **tracked**. Unfinished work is forecast from today, so nothing can still be scheduled in the past. Every date is compared with the baseline, and each task's reported progress is checked against how far through its window it should be.
+
+For each status update ("UAT is done, billing at 60%, Kim's migration slipped a week"), edit the candidate and record it:
+
+- finished work: `status: "done"` and `actual_finish` (plus `actual_start` if unknown so far)
+- work under way: `status: "in_progress"`, `actual_start`, `progress`
+- a reached milestone: `achieved: true` and `achieved_on`
+- a re-estimate: change `duration`, or `not_before` for a new earliest start
+- new risks, closed risks, decided decisions as they happen
+
+Then run:
+
+```bash
+node bin/planify.mjs update <folder>/candidate.plan.json --summary "Week 6 status" --by "<name>"
+```
+
+This writes the change log entry (diffed automatically against the previous update), finalizes the HTML and prints the changes. Reply with the link, the finish date against the baseline and the target, and the one or two changes that moved it. Never write actual dates in the future: record what happened, and use `duration` or `not_before` for what you expect.
+
+Re-baseline (`--replace`) only when the sponsor approves a re-plan, with a label that names the approval. Re-baselining to hide a slip defeats the purpose; say so if asked.
 
 ## What readers can do with the page
 
@@ -82,5 +110,7 @@ Reply in the user's language, briefly. The page carries the content.
 - Lead with a clickable Markdown link to the HTML with a descriptive title and its absolute path, wrapped in `<...>` when it contains spaces.
 - Then one or two sentences: the scheduled span and finish date, what drives the critical path, and anything that changes how the plan should be read: illustrative values, a missed target date, high open risks, decisions that block a gate.
 - Do not recap commands, receipts or the JSON. If asked whether it was checked, answer in one line, such as "Automated checks passed; not visually reviewed."
+
+For a status update: `Updated [Customer portal relaunch plan](</abs/path/customer-portal.html>). Finish moves to 2 Feb, 10 working days later than the baseline and still 18 ahead of target; the missing SSO tenant now drives the critical path.`
 
 Example: `Created [Customer portal relaunch plan](</abs/path/customer-portal.html>). 19 weeks, finishing 19 Jan; the critical path runs through design freeze and the account and case journeys. Dates and people are illustrative until you confirm them.`

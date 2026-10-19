@@ -171,6 +171,10 @@
     } else {
       head = `Finishes <b>${fmtY(S.end)}</b>, ${plural(S.workdays, 'working day')} after it starts.`;
     }
+    if (S.baseline) {
+      const d = S.baseline.delta;
+      head += ` <span class="drift ${d > 0 ? 'bad' : 'ok'}">${d === 0 ? 'On' : `${plural(Math.abs(d), 'working day')} ${d > 0 ? 'later than' : 'earlier than'}`} the baseline.</span>`;
+    }
     const drivers = S.criticalPath.filter((id) => S.nodes[id].kind === 'task' && items.get(id).status !== 'done' && items.get(id).status !== 'cancelled');
     const nextMs = milestones.map((m) => ({ m, d: S.nodes[m.id].ef })).filter((x) => !x.m.achieved && ms(x.d) >= ms(S.today)).sort((a, b) => ms(a.d) - ms(b.d))[0];
     return { head, drivers, nextMs };
@@ -183,21 +187,28 @@
     const highRisks = (plan.risks || []).filter((r) => r.status !== 'closed' && riskScore(r) >= 10).length;
     const openDecisions = (plan.decisions || []).filter((d) => !d.status || d.status === 'open');
     const dueSoon = openDecisions.filter((d) => d.due && nextMs && ms(d.due) <= ms(nextMs.d)).length;
+    const behind = Object.values(S.nodes).filter((n) => n.behind).length;
+    const slipped = Object.values(S.nodes).filter((n) => n.kind === 'task' && n.delta > 0 && !n.actual).length;
+    const updates = plan.updates || [];
+    const lastUpdate = updates[updates.length - 1];
     const shown = drivers.slice(0, 5);
     const driverHtml = shown.map((id) => `<button class="link" data-goto="${esc(id)}">${esc(items.get(id).label)}</button>`).join('<span class="arrow">→</span>') + (drivers.length > shown.length ? `<span class="muted"> and ${drivers.length - shown.length} more</span>` : '');
 
     const attention = [
-      late ? `<button class="attn bad" data-only="late">${plural(late, 'item')} behind schedule</button>` : '',
+      !S.tracking && late ? `<button class="attn bad" data-only="late">${plural(late, 'item')} behind schedule</button>` : '',
+      behind ? `<button class="attn bad" data-only="pace">${plural(behind, 'task')} behind pace</button>` : '',
+      slipped ? `<button class="attn warn" data-only="slip">${plural(slipped, 'task')} finishing later than baseline</button>` : '',
       highRisks ? `<button class="attn warn" data-view-go="risks">${plural(highRisks, 'high risk')} open</button>` : '',
       openDecisions.length ? `<button class="attn" data-scroll="decisions">${plural(openDecisions.length, 'decision')} needed${dueSoon ? `, ${dueSoon} before the next milestone` : ''}</button>` : '',
     ].filter(Boolean).join('');
 
     el.innerHTML = `
       <div class="panel verdict">
-        <div class="eyebrow">${SIM.active() ? 'What-if, not saved' : `As of ${fmtY(S.today)}`} · ${S.progress}% of planned work done</div>
+        <div class="eyebrow">${SIM.active() ? 'What-if, not saved' : `As of ${fmtY(S.today)}`} · ${S.progress}% of planned work done${S.baseline ? ` · measured against “${esc(S.baseline.label)}”, ${fmt(S.baseline.taken)}` : ''}</div>
         <p class="headline">${head}</p>
         ${drivers.length ? `<p class="drivers"><span class="muted">The date is set by</span> ${driverHtml}. <span class="muted">A slip in any of these moves the finish.</span></p>` : ''}
         ${nextMs ? `<p class="next"><span class="muted">Next milestone</span> <b>${esc(nextMs.m.label)}</b> on ${fmt(nextMs.d)}${ms(nextMs.d) > ms(S.today) ? `, in ${plural(wdDiff(S.today, nextMs.d), 'working day')}` : ', today'}.</p>` : ''}
+        ${lastUpdate && lastUpdate.changes?.length ? `<p class="next"><span class="muted">Since the last update</span> <button class="link" data-scroll="history">${plural(lastUpdate.changes.length, 'change')}</button>${lastUpdate.finish_was && lastUpdate.finish_was !== lastUpdate.finish ? `, finish ${wdDiff(lastUpdate.finish_was, lastUpdate.finish) > 0 ? '+' : '−'}${plural(Math.abs(wdDiff(lastUpdate.finish_was, lastUpdate.finish)), 'working day')}` : ', finish unchanged'} <span class="muted">(${fmt(lastUpdate.date)}${lastUpdate.summary ? `, ${esc(lastUpdate.summary)}` : ''})</span>.</p>` : ''}
         ${attention ? `<div class="attn-row">${attention}</div>` : '<div class="attn-row"><span class="attn ok">Nothing is behind schedule</span></div>'}
         ${miniTimeline()}
       </div>
@@ -209,6 +220,7 @@
           ${ov.success_criteria?.length ? `<table class="criteria"><tbody>${ov.success_criteria.map((c) => `<tr><td>${esc(c.label)}</td><td class="num">${esc(c.target || '')}</td></tr>`).join('')}</tbody></table>` : ''}
         </div>
         <div class="panel"><h2>Milestones</h2>${milestoneList()}</div>
+        ${updates.length ? historyPanel(updates) : ''}
         <div class="panel">
           <h2>Scope</h2>
           ${ov.scope?.in?.length ? `<ul class="scope in">${ov.scope.in.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>` : ''}
@@ -219,6 +231,15 @@
         ${ov.assumptions?.length || ov.constraints?.length ? `<div class="panel">${ov.assumptions?.length ? `<h2>Assumptions</h2><ul class="clean">${ov.assumptions.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>` : ''}${ov.constraints?.length ? `<h2 style="margin-top:16px">Constraints</h2><ul class="clean">${ov.constraints.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>` : ''}</div>` : ''}
         ${plan.budget?.lines?.length ? renderBudget() : ''}
       </div>`;
+  }
+
+  // Newest first; each update says what moved and what it did to the finish date.
+  function historyPanel(updates) {
+    return `<div class="panel" id="history"><h2>Progress log</h2><ol class="history">${[...updates].reverse().map((u) => {
+      const d = u.finish_was ? wdDiff(u.finish_was, u.finish) : 0;
+      const changes = u.changes || [];
+      return `<li><div class="h-head"><span class="when">${fmt(u.date)}</span><b>${esc(u.summary || 'Update')}</b>${u.by ? `<span class="muted small"> · ${esc(u.by)}</span>` : ''}${u.finish_was ? `<span class="h-delta ${d > 0 ? 'bad' : d < 0 ? 'ok' : 'muted'}">${d === 0 ? 'finish unchanged' : `finish ${d > 0 ? '+' : '−'}${Math.abs(d)}d → ${fmt(u.finish)}`}</span>` : `<span class="h-delta muted">finish ${fmt(u.finish)}</span>`}</div>${changes.length ? `<ul>${changes.slice(0, 4).map((c) => `<li>${esc(c)}</li>`).join('')}</ul>${changes.length > 4 ? `<details><summary>${changes.length - 4} more</summary><ul>${changes.slice(4).map((c) => `<li>${esc(c)}</li>`).join('')}</ul></details>` : ''}` : ''}</li>`;
+    }).join('')}</ol></div>`;
   }
 
   // Phases drawn to scale with milestones and today on the same line; a phase opens the roadmap focused on it.
@@ -249,7 +270,8 @@
     if (!milestones.length) return '<p class="muted small">No milestones yet. Give each phase an exit gate with criteria.</p>';
     return `<ol class="ms-list">${milestones.map((m) => ({ m, n: S.nodes[m.id] })).sort((a, b) => ms(a.n.ef) - ms(b.n.ef)).map(({ m, n }) => {
       const state = m.achieved ? 'ok' : n.late ? 'bad' : ms(n.ef) < ms(S.today) ? '' : 'todo';
-      return `<li class="${state}"><span class="when">${fmt(n.ef)}</span><span><button class="link strong" data-goto="${esc(m.id)}">${esc(m.label)}</button>${m.achieved ? ' <span class="tag ok">achieved</span>' : n.late ? ' <span class="tag bad">late</span>' : ''}${m.criteria?.length ? `<span class="small muted block">${m.criteria.map(esc).join(' · ')}</span>` : ''}</span></li>`;
+      const moved = n.base && n.delta ? ` <span class="tag ${n.delta > 0 ? 'bad' : 'ok'}" title="Baseline ${fmt(n.base.ef)}">${n.delta > 0 ? '+' : '−'}${Math.abs(n.delta)}d</span>` : '';
+      return `<li class="${state}"><span class="when">${fmt(n.ef)}${moved}</span><span><button class="link strong" data-goto="${esc(m.id)}">${esc(m.label)}</button>${m.achieved ? ' <span class="tag ok">achieved</span>' : n.late ? ' <span class="tag bad">late</span>' : ''}${m.criteria?.length ? `<span class="small muted block">${m.criteria.map(esc).join(' · ')}</span>` : ''}</span></li>`;
     }).join('')}</ol>`;
   }
 
@@ -262,8 +284,8 @@
   }
 
   // ---- roadmap (Gantt) ------------------------------------------------------
-  const G = { group: 'phase', zoom: null, deps: true, crit: true, filter: '', only: null, collapsed: new Set(), selected: null };
-  const onlyLabel = () => !G.only ? '' : G.only.kind === 'late' ? 'Behind schedule' : G.only.kind === 'critical' ? 'Critical path' : `${roleName(G.only.id)}${roles.get(G.only.id)?.person ? ` (${roles.get(G.only.id).person})` : ''}`;
+  const G = { group: 'phase', zoom: null, deps: true, crit: true, base: true, filter: '', only: null, collapsed: new Set(), selected: null };
+  const onlyLabel = () => !G.only ? '' : G.only.kind === 'late' ? 'Behind schedule' : G.only.kind === 'pace' ? 'Behind pace' : G.only.kind === 'slip' ? 'Later than baseline' : G.only.kind === 'critical' ? 'Critical path' : `${roleName(G.only.id)}${roles.get(G.only.id)?.person ? ` (${roles.get(G.only.id).person})` : ''}`;
   function renderRoadmap() {
     const el = $('#view-roadmap');
     const span = (ms(S.end) - ms(S.start)) / DAY;
@@ -275,6 +297,7 @@
         <span><span class="ctl-label">Scale</span><span class="seg-ctl" id="g-zoom">${['week', 'month', 'quarter'].map((k) => `<button data-v="${k}" aria-pressed="${G.zoom === k}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('')}</span></span>
         <label class="check"><input type="checkbox" id="g-deps" ${G.deps ? 'checked' : ''}> Dependencies</label>
         <label class="check"><input type="checkbox" id="g-crit" ${G.crit ? 'checked' : ''}> Critical path</label>
+        ${S.baseline ? `<label class="check"><input type="checkbox" id="g-base" ${G.base ? 'checked' : ''}> Baseline</label>` : ''}
         <input type="search" id="g-filter" placeholder="Find a task or person" aria-label="Find a task or person" value="${esc(G.filter)}">
         ${G.only ? `<button class="only-chip" id="g-only" aria-label="Show everything">Showing: ${esc(onlyLabel())} <span aria-hidden="true">×</span></button>` : `<button class="btn quiet" data-only="critical">Only the critical path</button>`}
       </div>
@@ -287,12 +310,14 @@
         <span><i style="border:1.6px dashed var(--bad);background:none"></i>Behind schedule</span>
         <span><i style="background:none;border-left:2px dashed var(--today);width:2px;border-radius:0"></i>Today</span>
         <span><svg width="10" height="10" style="vertical-align:middle;margin-right:6px"><circle cx="5" cy="5" r="4" fill="var(--bad)"/></svg>High risk attached</span>
-        <span class="sim-only"><i style="border:1.5px dashed var(--ink-3);background:none"></i>Original dates</span>
+        <span class="sim-only"><i style="border:1.5px dashed var(--ink-3);background:none"></i>Before this what-if</span>
+        ${S.baseline ? `<span><i style="height:4px;background:var(--ink-3);opacity:.55"></i>Baseline: ${esc(S.baseline.label)}</span><span><i style="background:repeating-linear-gradient(135deg,var(--ink-3) 0 2px,transparent 2px 5px);opacity:.6"></i>Forecast beyond plan</span>` : ''}
       </div>`;
     $$('#g-group button').forEach((b) => b.addEventListener('click', () => { G.group = b.dataset.v; G.collapsed.clear(); renderRoadmap(); }));
     $$('#g-zoom button').forEach((b) => b.addEventListener('click', () => { G.zoom = b.dataset.v; renderRoadmap(); }));
     $('#g-deps').addEventListener('change', (e) => { G.deps = e.target.checked; $('#gantt').classList.toggle('hide-deps', !G.deps); });
     $('#g-crit').addEventListener('change', (e) => { G.crit = e.target.checked; $('#gantt').classList.toggle('hide-crit', !G.crit); });
+    $('#g-base')?.addEventListener('change', (e) => { G.base = e.target.checked; $('#gantt').classList.toggle('hide-base', !G.base); });
     $('#g-filter').addEventListener('input', (e) => { G.filter = e.target.value; drawGantt(); });
     $('#g-only')?.addEventListener('click', (e) => { e.stopPropagation(); G.only = null; renderRoadmap(); });
     drawGantt();
@@ -329,6 +354,8 @@
     const match = (it) => {
       const n = S.nodes[it.id];
       if (G.only?.kind === 'late' && !n.late) return false;
+      if (G.only?.kind === 'pace' && !n.behind) return false;
+      if (G.only?.kind === 'slip' && !(n.delta > 0 && !n.actual)) return false;
       if (G.only?.kind === 'critical' && !n.critical) return false;
       if (G.only?.kind === 'owner' && it.owner !== G.only.id) return false;
       return !q || [it.label, it.id, who(it.owner), roleName(it.owner), it.detail].some((s) => String(s || '').toLowerCase().includes(q));
@@ -422,23 +449,26 @@
       const movedFromBase = SIM.active() && (b0.es !== n.es || b0.ef !== n.ef);
       if (it.kind === 'milestone') {
         const mx = x(n.ef) + dayW / 2;
+        if (n.base && n.base.ef !== n.ef) { const bxm = x(n.base.ef) + dayW / 2; out.push(`<path class="g-baseline" d="M${bxm} ${cy + 6} L${bxm + 4} ${cy + 10} L${bxm} ${cy + 14} L${bxm - 4} ${cy + 10}Z"/>`); }
         if (movedFromBase) { const gx = x(b0.ef) + dayW / 2; out.push(`<path class="g-ghost" d="M${gx} ${cy - 7} L${gx + 7} ${cy} L${gx} ${cy + 7} L${gx - 7} ${cy}Z"/>`); }
         out.push(`<g class="g-ms ${cls}" data-id="${esc(it.id)}"><path d="M${mx} ${cy - 8} L${mx + 8} ${cy} L${mx} ${cy + 8} L${mx - 8} ${cy}Z" fill="${it.achieved ? 'var(--ok)' : color}"/></g>`);
         out.push(`<text class="g-bar-text" x="${mx + 13}" y="${cy + 4}">${esc(fmt(n.ef))}${ownerTxt ? ' · ' + esc(ownerTxt) : ''}</text>`);
       } else {
         const bx = x(n.es), bw = Math.max(dayW, x(n.ef) + dayW - x(n.es));
         const prog = Number.isFinite(it.progress) ? it.progress : it.status === 'done' ? 100 : 0;
+        if (n.base) out.push(`<rect class="g-baseline" x="${x(n.base.es)}" y="${cy + 9}" width="${Math.max(dayW, x(n.base.ef) + dayW - x(n.base.es))}" height="3" rx="1.5"/>`);
         if (movedFromBase) out.push(`<rect class="g-ghost" x="${x(b0.es)}" y="${cy - 9}" width="${Math.max(dayW, x(b0.ef) + dayW - x(b0.es))}" height="18" rx="5"/>`);
         out.push(`<g class="g-bar ${cls}${SIM.over[it.id] ? ' changed' : ''}" data-id="${esc(it.id)}" tabindex="0" role="button" aria-label="${esc(it.label)}, ${fmt(n.es)} to ${fmt(n.ef)}, ${n.dur} working days${n.critical ? ', critical path' : ''}">`);
         out.push(`<rect class="track" x="${bx}" y="${cy - 8}" width="${bw}" height="16" rx="4" fill="${color}"/>`);
         if (prog > 0) out.push(`<rect x="${bx}" y="${cy - 8}" width="${(bw * prog) / 100}" height="16" rx="4" fill="${color}"/>`);
+        if (n.forecast && n.base && ms(n.ef) > ms(n.base.ef)) { const fx = Math.max(bx, x(n.base.ef) + dayW); out.push(`<rect class="g-forecast" x="${fx}" y="${cy - 8}" width="${bx + bw - fx}" height="16" rx="4"/>`); }
         out.push(`<rect class="edge" x="${bx}" y="${cy - 8}" width="${bw}" height="16" rx="4"/>`);
         out.push(`<rect class="grip" x="${bx + bw - 4}" y="${cy - 6}" width="3" height="12" rx="1.5"/>`);
         out.push('</g>');
         const risk = riskOf.get(it.id);
         const hot = risk && riskScore(risk) >= 10;
         if (hot) out.push(`<circle class="g-risk" cx="${bx + bw + 9}" cy="${cy}" r="4" fill="${riskScore(risk) >= 15 ? 'var(--bad)' : 'var(--warn)'}"><title>${esc(risk.title)} (risk ${riskScore(risk)})</title></circle>`);
-        out.push(`<text class="g-bar-text" x="${bx + bw + (hot ? 18 : 6)}" y="${cy + 4}">${ownerTxt ? esc(ownerTxt) : ''}${it.status && it.status !== 'planned' ? `${ownerTxt ? ' · ' : ''}${esc(it.status.replace('_', ' '))}` : ''}${prog > 0 && prog < 100 ? ` ${prog}%` : ''}</text>`);
+        out.push(`<text class="g-bar-text" x="${bx + bw + (hot ? 18 : 6)}" y="${cy + 4}">${ownerTxt ? esc(ownerTxt) : ''}${it.status && it.status !== 'planned' ? `${ownerTxt ? ' · ' : ''}${esc(it.status.replace('_', ' '))}` : ''}${prog > 0 && prog < 100 ? ` ${prog}%` : ''}${n.behind ? ` <tspan class="bad">· behind pace</tspan>` : ''}</text>`);
       }
       out.push('</g>');
     }
@@ -488,6 +518,7 @@
     };
     wrap.onscroll = pin;
     wrap.classList.toggle('hide-crit', !G.crit);
+    wrap.classList.toggle('hide-base', !G.base);
 
     // scroll to today on first draw when the project is underway
     if (!wrap.dataset.scrolled && todayX - labelW > (wrap.clientWidth - labelW) * 0.6) wrap.scrollLeft = todayX - labelW - (wrap.clientWidth - labelW) * 0.35;
@@ -598,7 +629,7 @@
   }
   function tip(e, id) {
     const { it, n, when } = describe(id);
-    tipEl.innerHTML = `<b>${esc(it.label)}</b><div class="muted">${when}</div>${it.owner ? `<div>${esc(roleName(it.owner))}${roles.get(it.owner)?.person ? ` · ${esc(roles.get(it.owner).person)}` : ''}</div>` : ''}<div class="small">${n.critical ? '<span style="color:var(--crit)">Critical path</span>' : `${n.slack} day${n.slack === 1 ? '' : 's'} of slack`}${n.late ? ' · <span style="color:var(--bad)">behind schedule</span>' : ''}</div>`;
+    tipEl.innerHTML = `<b>${esc(it.label)}</b><div class="muted">${when}</div>${it.owner ? `<div>${esc(roleName(it.owner))}${roles.get(it.owner)?.person ? ` · ${esc(roles.get(it.owner).person)}` : ''}</div>` : ''}<div class="small">${n.critical ? '<span style="color:var(--crit)">Critical path</span>' : `${n.slack} day${n.slack === 1 ? '' : 's'} of slack`}${n.late && !S.tracking ? ' · <span style="color:var(--bad)">behind schedule</span>' : ''}${n.delta ? ` · <span class="${n.delta > 0 ? 'bad' : 'ok'}">${n.delta > 0 ? '+' : '−'}${Math.abs(n.delta)}d vs baseline</span>` : ''}${n.behind ? ' · <span class="bad">behind pace</span>' : ''}</div>`;
     tipEl.classList.add('on');
     positionTip(e);
   }
@@ -650,6 +681,10 @@
         ${it.phase ? `<dt>Phase</dt><dd><span class="dot" style="background:${phaseColor(it.phase)}"></span> ${esc(phases[phaseIdx.get(it.phase)].label)}</dd>` : ''}
         ${it.owner ? `<dt>Owner</dt><dd><button class="link" data-role="${esc(it.owner)}" title="Show all their work">${esc(roleName(it.owner))}${roles.get(it.owner)?.person ? ` · ${esc(roles.get(it.owner).person)}` : ''}</button></dd>` : ''}
         ${it.status ? `<dt>Status</dt><dd>${esc(it.status.replace('_', ' '))}${Number.isFinite(it.progress) ? ` · ${it.progress}%` : ''}</dd>` : ''}
+        ${it.actual_start || it.actual_finish ? `<dt>Actual</dt><dd>${it.actual_start ? `started ${fmt(it.actual_start)}` : ''}${it.actual_finish ? `${it.actual_start ? ', ' : ''}finished ${fmt(it.actual_finish)}` : ''}</dd>` : ''}
+        ${n.base ? `<dt>Baseline</dt><dd>${it.kind === 'milestone' ? fmt(n.base.ef) : `${fmt(n.base.es)} → ${fmt(n.base.ef)}`}${n.delta ? ` <span class="${n.delta > 0 ? 'bad' : 'ok'}">(${n.delta > 0 ? 'now ' + plural(n.delta, 'working day') + ' later' : 'now ' + plural(-n.delta, 'working day') + ' earlier'})</span>` : ' <span class="muted">(on baseline)</span>'}</dd>` : ''}
+        ${n.expected !== undefined ? `<dt>Pace</dt><dd>${n.reported}% reported, ${n.expected}% expected by today${n.behind ? ' <b class="bad">behind</b>' : ''}</dd>` : ''}
+        ${n.forecast ? `<dt>Forecast</dt><dd>${it.kind === 'task' && (it.actual_start || it.progress) ? 'Remaining work counted from today' : 'Not started yet, so it can start today at the earliest'}</dd>` : ''}
         ${it.effort_days ? `<dt>Effort</dt><dd>${it.effort_days} person-days</dd>` : ''}
         ${deliverable ? `<dt>Delivers</dt><dd>${esc(deliverable.label)}</dd>` : ''}
         <dt>Slack</dt><dd>${n.critical ? '<b style="color:var(--crit)">None. It is on the critical path</b>' : `${plural(n.slack, 'working day')}: it can finish as late as ${fmt(n.lf)} without moving the end date`}</dd>
@@ -660,7 +695,7 @@
       </dl>
       ${it.kind === 'task' ? `<div class="whatif" aria-label="What if">
         <span class="small muted">What if it</span>
-        <button class="btn" data-w="-1">starts a day earlier</button><button class="btn" data-w="1">starts a day later</button>
+        ${it.actual_start ? '' : '<button class="btn" data-w="-1">starts a day earlier</button><button class="btn" data-w="1">starts a day later</button>'}
         <button class="btn" data-d="-1">takes a day less</button><button class="btn" data-d="1">takes a day more</button>
         <p class="small bad" id="whatif-msg" hidden></p>
       </div>` : ''}`;

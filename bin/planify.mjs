@@ -7,10 +7,20 @@ import { validate } from '../lib/validate.mjs';
 import { schedule } from '../lib/schedule.mjs';
 import { renderHtml, VERSION } from '../lib/render.mjs';
 import { planToMarkdown, planToCsv } from '../lib/markdown.mjs';
+import { takeBaseline, recordUpdate } from '../lib/tracking.mjs';
 
 const argv = process.argv.slice(2);
-const flags = new Set(argv.filter((a) => a.startsWith('--')));
-const args = argv.filter((a) => !a.startsWith('--'));
+const VALUED = new Set(['--label', '--summary', '--by', '--today']);
+const flags = new Set();
+const opts = {};
+const args = [];
+for (let i = 0; i < argv.length; i++) {
+  const a = argv[i];
+  const [k, v] = a.split(/=(.*)/s);
+  if (VALUED.has(k)) opts[k.slice(2)] = v !== undefined ? v : argv[++i];
+  else if (a.startsWith('--')) flags.add(a);
+  else args.push(a);
+}
 const json = flags.has('--json');
 const [cmd, ...rest] = args;
 
@@ -19,10 +29,14 @@ const USAGE = `planify ${VERSION}
 Usage:
   planify finalize <candidate.plan.json> [output.html] [--json]   validate, schedule, render, check
   planify validate <candidate.plan.json> [--json]                 validate and schedule only
+  planify baseline <candidate.plan.json> [--label "…"] [--replace] freeze today's schedule and start tracking
+  planify update <candidate.plan.json> --summary "…" [--by "…"] [output.html]
+                                                                  record a status update, then finalize
   planify export md|csv <candidate.plan.json> [output]            Markdown summary or task CSV
   planify doctor                                                  check the install
 
-The output path defaults to meta.output, resolved from the current directory.`;
+The output path defaults to meta.output, resolved from the current directory.
+--today YYYY-MM-DD overrides the "as of" date for baseline and update.`;
 
 function load(path) {
   const abs = resolve(path);
@@ -71,25 +85,8 @@ function summary(plan, sched) {
   };
 }
 
-switch (cmd) {
-  case 'validate': {
-    if (!rest[0]) { console.error(USAGE); process.exit(2); }
-    const plan = load(rest[0]);
-    const { warnings, sched } = check(plan);
-    if (json) process.stdout.write(JSON.stringify({ ok: true, gate: 'validate', warnings, summary: summary(plan, sched) }, null, 2) + '\n');
-    else {
-      console.log(`✓ valid · ${sched.start} → ${sched.end} · ${sched.workdays} working days · critical path: ${sched.criticalPath.join(' → ')}`);
-      printWarnings(warnings);
-    }
-    break;
-  }
-
-  case 'finalize':
-  case 'render': {
-    if (!rest[0]) { console.error(USAGE); process.exit(2); }
-    const plan = load(rest[0]);
-    const { warnings, sched } = check(plan);
-    const out = resolve(rest[1] || plan.meta.output || join(dirname(resolve(rest[0])), basename(rest[0]).replace(/(\.plan)?\.json$/i, '') + '.html'));
+function finalize(plan, sched, warnings, candidatePath, outArg) {
+    const out = resolve(outArg || plan.meta.output || join(dirname(resolve(candidatePath)), basename(candidatePath).replace(/(\.plan)?\.json$/i, '') + '.html'));
     const html = renderHtml(plan, sched, warnings);
 
     // Self-check the artifact before it replaces anything on disk.
@@ -120,6 +117,73 @@ switch (cmd) {
       console.log(`  critical path: ${sched.criticalPath.join(' → ')}`);
       printWarnings(warnings);
     }
+}
+
+function save(path, plan) {
+  const abs = resolve(path);
+  writeFileSync(abs + '.tmp', JSON.stringify(plan, null, 2) + '\n');
+  renameSync(abs + '.tmp', abs);
+}
+
+switch (cmd) {
+  case 'validate': {
+    if (!rest[0]) { console.error(USAGE); process.exit(2); }
+    const plan = load(rest[0]);
+    const { warnings, sched } = check(plan);
+    if (json) process.stdout.write(JSON.stringify({ ok: true, gate: 'validate', warnings, summary: summary(plan, sched) }, null, 2) + '\n');
+    else {
+      console.log(`✓ valid · ${sched.start} → ${sched.end} · ${sched.workdays} working days · critical path: ${sched.criticalPath.join(' → ')}`);
+      printWarnings(warnings);
+    }
+    break;
+  }
+
+  case 'finalize':
+  case 'render': {
+    if (!rest[0]) { console.error(USAGE); process.exit(2); }
+    const plan = load(rest[0]);
+    const { warnings, sched } = check(plan);
+    finalize(plan, sched, warnings, rest[0], rest[1]);
+    break;
+  }
+
+  case 'baseline': {
+    if (!rest[0]) { console.error(USAGE); process.exit(2); }
+    const plan = load(rest[0]);
+    if (opts.today) plan.meta.today = opts.today;
+    if (plan.baseline && !flags.has('--replace')) {
+      fail([{ code: 'track/baseline-exists', path: '$.baseline', message: `This plan already has a baseline ("${plan.baseline.label}", ${plan.baseline.taken}).`, fix: 'Re-baseline only after an approved re-plan, with --replace and a --label that names the approval.' }], [], 'baseline');
+    }
+    delete plan.baseline;
+    const { sched } = check(plan);
+    plan.baseline = takeBaseline(plan, sched, opts.label);
+    const tracked = check(plan);
+    plan.updates = recordUpdate(plan, tracked.sched, { summary: flags.has('--replace') ? `Re-baselined: ${plan.baseline.label}` : `Baseline taken: ${plan.baseline.label}` });
+    if (opts.today) delete plan.meta.today;
+    save(rest[0], plan);
+    if (json) process.stdout.write(JSON.stringify({ ok: true, gate: 'baseline', baseline: { label: plan.baseline.label, taken: plan.baseline.taken, end: plan.baseline.end } }, null, 2) + '\n');
+    else console.log(`✓ baseline "${plan.baseline.label}" taken ${plan.baseline.taken} · finish ${plan.baseline.end} · tracking is on`);
+    break;
+  }
+
+  case 'update': {
+    if (!rest[0]) { console.error(USAGE); process.exit(2); }
+    const plan = load(rest[0]);
+    if (!plan.baseline) fail([{ code: 'track/no-baseline', path: '$.baseline', message: 'Status updates need a baseline to measure against.', fix: 'Run `planify baseline <candidate>` once the plan is agreed, then record updates.' }], [], 'update');
+    const pinned = plan.meta.today;
+    if (opts.today) plan.meta.today = opts.today;
+    const first = check(plan);
+    plan.updates = recordUpdate(plan, first.sched, { summary: opts.summary, by: opts.by });
+    if (opts.today && pinned === undefined) delete plan.meta.today; else if (opts.today) plan.meta.today = pinned;
+    save(rest[0], plan);
+    const u = plan.updates[plan.updates.length - 1];
+    if (!json) {
+      console.log(`✓ update recorded ${u.date}: ${u.changes.length} change${u.changes.length === 1 ? '' : 's'}, finish ${u.finish}${u.finish_was && u.finish_was !== u.finish ? ` (was ${u.finish_was})` : ''}`);
+      for (const c of u.changes) console.log(`  · ${c}`);
+    }
+    if (opts.today) plan.meta.today = opts.today;
+    const { warnings, sched } = check(plan);
+    finalize(plan, sched, warnings, rest[0], rest[1]);
     break;
   }
 

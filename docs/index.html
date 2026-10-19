@@ -121,6 +121,8 @@ h2 { font-size: clamp(26px, 3.4vw, 38px); letter-spacing: -.025em; line-height: 
 
 .ideas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 14px; }
 .idea { padding: 22px; }
+.ideas.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 1040px) { .ideas.four { grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); } }
 .idea .n { font-family: var(--mono); color: var(--ink-3); font-size: 12.5px; }
 .idea h3 { margin: 6px 0 8px; font-size: 18px; letter-spacing: -.01em; }
 .idea p { margin: 0; color: var(--ink-2); }
@@ -154,6 +156,7 @@ footer a { color: var(--ink-2); }
     <a class="brand" href="./"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--accent)"/><rect x="6" y="9" width="12" height="4" rx="2" fill="#fff"/><rect x="12" y="15" width="14" height="4" rx="2" fill="#fff" opacity=".8"/><rect x="9" y="21" width="9" height="4" rx="2" fill="#fff" opacity=".6"/></svg>planify</a>
     <div class="navlinks">
       <a href="examples/customer-portal.html">Live demo</a>
+      <a class="opt" href="#track">Tracking</a>
       <a class="opt" href="#install">Install</a>
       <a href="https://github.com/filipromeling-max/planify">GitHub</a>
       <button class="theme" id="theme" aria-label="Toggle theme">◐</button>
@@ -233,6 +236,23 @@ footer a { color: var(--ink-2); }
       <div class="step"><b>3 · Schedule</b><span>Working-day calendar, FS/SS/FF dependencies with lag, forward and backward pass, slack, critical path.</span></div>
       <div class="step"><b>4 · Render</b><span>One self-checked HTML file, written atomically, with a receipt.</span></div>
     </div>
+  </section>
+
+  <section id="track">
+    <div class="eyebrow">Tracking</div>
+    <h2>A plan from September is wrong by October. This one updates.</h2>
+    <p class="sub">Freeze the agreed plan as a baseline. Tell your agent what happened each week. planify records actual dates, forecasts the rest from today and writes the change log for you.</p>
+    <div class="ideas four">
+      <div class="card idea"><div class="n">baseline</div><h3>Drift you can point at</h3><p>Every date, milestone and the finish show how far they have moved: “10 working days later than the baseline, still 18 ahead of target.”</p></div>
+      <div class="card idea"><div class="n">forecast</div><h3>Nothing happens in the past</h3><p>Unfinished work is forecast from today, from its remaining share. A late task pushes everything after it, and the critical path follows.</p></div>
+      <div class="card idea"><div class="n">pace</div><h3>Behind before it is late</h3><p>A task at 30% that should be at 100% by now is flagged behind pace while there is still time to act.</p></div>
+      <div class="card idea"><div class="n">log</div><h3>The status email writes itself</h3><p>Each update is diffed against the last: “Platform 5% → 30% · Go-live moves to 15 Jan (was 7 Jan) · New risk: SSO tenant.”</p></div>
+    </div>
+    <div class="copyable" style="margin-top:20px"><pre><span class="c"># once the sponsor agrees the plan</span>
+node bin/planify.mjs baseline plan.json --label "Approved at kick-off"
+
+<span class="c"># every week, after editing statuses and actual dates</span>
+node bin/planify.mjs update plan.json --summary "Week 6 status"</pre></div>
   </section>
 
   <section id="install">

@@ -327,6 +327,23 @@ ol.ms-list .when { font-family: var(--mono); font-size: 12px; color: var(--ink-3
 @media (max-width: 640px) { .sim-actions { margin-left: 0; } .headline { font-size: 20px; } .verdict { padding: 16px; } .mt-seg span { display: none; } }
 @media print { .hint, .whatif, .sim-actions { display: none !important; } .sim-bar { display: block; } }
 
+/* ---- tracking ---------------------------------------------------------------- */
+.drift { font-size: .72em; font-weight: 500; white-space: nowrap; }
+.g-baseline { fill: var(--ink-3); opacity: .55; pointer-events: none; }
+.g-forecast { fill: var(--ink-3); opacity: .22; pointer-events: none; }
+.hide-base .g-baseline { display: none; }
+svg tspan.bad { fill: var(--bad); }
+ol.history { list-style: none; margin: 0; padding: 0; }
+ol.history > li { padding: 10px 0; border-top: 1px solid var(--line); }
+ol.history > li:first-child { border-top: 0; padding-top: 0; }
+.h-head { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.h-head .when { font-family: var(--mono); font-size: 12px; color: var(--ink-3); min-width: 50px; }
+.h-delta { margin-left: auto; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+ol.history ul { margin: 6px 0 0 60px; padding: 0 0 0 14px; color: var(--ink-2); font-size: 13px; }
+ol.history details { margin-left: 60px; font-size: 12.5px; color: var(--ink-3); }
+ol.history details ul { margin-left: 0; }
+ol.history summary { cursor: pointer; }
+
 </style>
 </head>
 <body>
@@ -371,7 +388,7 @@ ol.ms-list .when { font-family: var(--mono); font-size: 12px; color: var(--ink-3
   </footer>
 </main>
 <aside class="drawer" id="drawer" aria-live="polite"></aside>
-<script type="application/json" id="plan-data">{"generator":"planify 1.0.0","plan":{"schema_version":1,"plan_type":"project","meta":{"title":"Customer portal relaunch","subtitle":"Replace the legacy self-service portal with a new web app on the shared design system.","owner":"Head of Digital","status":"active","evidence":"illustrative","start":"2026-09-07","end":"2027-02-26","today":"2026-10-19","output":"examples/customer-portal.html","calendar":{"workdays":[1,2,3,4,5],"holidays":["2026-12-24","2026-12-25","2026-12-31","2027-01-01"]}},"overview":{"goal":"Launch a self-service portal that resolves 60% of support requests without an agent by March 2027.","problem":"The legacy portal is unsupported, fails accessibility audits and pushes 70% of customers to the phone line.","scope":{"in":["Account, billing and case management journeys","Migration of active customer accounts","SSO with the corporate identity provider","WCAG 2.2 AA compliance"],"out":["Native mobile apps","Partner portal","Replacing the CRM"]},"success_criteria":[{"label":"Self-service resolution rate","target":"≥ 60%"},{"label":"Customer satisfaction (CSAT)","target":"≥ 4.3 / 5"},{"label":"Accessibility audit","target":"0 critical findings"},{"label":"Legacy portal","target":"Decommissioned"}],"assumptions":["The design system team delivers form components by October","CRM API rate limits allow 50 req/s"],"constraints":["Launch freeze from 18 Dec to 6 Jan","Budget fixed at €420k"]},"phases":[{"id":"discover","label":"Discovery","goal":"Validate journeys and pick the architecture.","owner":"pm"},{"id":"design","label":"Design","goal":"Tested prototypes for the three core journeys.","owner":"design-lead"},{"id":"build","label":"Build","goal":"Feature-complete portal in staging.","owner":"tech-lead"},{"id":"launch","label":"Launch","goal":"Customers migrated and legacy switched off.","owner":"pm"}],"workstreams":[{"id":"ux","label":"Experience","owner":"design-lead"},{"id":"eng","label":"Engineering","owner":"tech-lead"},{"id":"data","label":"Data & migration","owner":"data-eng"},{"id":"change","label":"Change & support","owner":"support-lead"}],"roles":[{"id":"sponsor","label":"Sponsor","person":"Head of Digital","kind":"sponsor"},{"id":"steerco","label":"Steering group","kind":"steering","reports_to":"sponsor"},{"id":"pm","label":"Project manager","person":"Alex","kind":"lead","reports_to":"steerco","fte":1},{"id":"design-lead","label":"Design lead","person":"Sam","kind":"lead","reports_to":"pm","fte":1},{"id":"tech-lead","label":"Tech lead","person":"Robin","kind":"lead","reports_to":"pm","fte":1},{"id":"dev-team","label":"Dev team (4)","kind":"team","reports_to":"tech-lead","fte":4},{"id":"data-eng","label":"Data engineer","person":"Kim","kind":"team","reports_to":"tech-lead","fte":1},{"id":"support-lead","label":"Support lead","person":"Jo","kind":"lead","reports_to":"pm","fte":0.5},{"id":"security","label":"Security office","kind":"stakeholder"},{"id":"a11y-vendor","label":"Accessibility auditor","org":"External","kind":"vendor","reports_to":"pm"}],"wbs":[{"id":"portal","label":"New customer portal","kind":"outcome"},{"id":"w-research","label":"Research & architecture","parent":"portal","kind":"deliverable"},{"id":"w-insights","label":"Journey insights report","parent":"w-research","kind":"work_package"},{"id":"w-arch","label":"Architecture decision record","parent":"w-research","kind":"work_package"},{"id":"w-experience","label":"Experience design","parent":"portal","kind":"deliverable"},{"id":"w-proto","label":"Tested prototypes","parent":"w-experience","kind":"work_package"},{"id":"w-app","label":"Portal application","parent":"portal","kind":"deliverable"},{"id":"w-platform","label":"Platform & SSO","parent":"w-app","kind":"work_package"},{"id":"w-journeys","label":"Account, billing, cases","parent":"w-app","kind":"work_package"},{"id":"w-quality","label":"Test & accessibility evidence","parent":"w-app","kind":"work_package"},{"id":"w-transition","label":"Transition","parent":"portal","kind":"deliverable"},{"id":"w-migration","label":"Migrated accounts","parent":"w-transition","kind":"work_package"},{"id":"w-support","label":"Support readiness","parent":"w-transition","kind":"work_package"}],"tasks":[{"id":"kickoff","label":"Kick-off & stakeholder map","phase":"discover","workstream":"change","owner":"pm","start":"2026-09-07","duration":3,"status":"done","deliverable":"w-insights"},{"id":"research","label":"Customer interviews & analytics","phase":"discover","workstream":"ux","owner":"design-lead","duration":12,"depends_on":["kickoff"],"status":"done","deliverable":"w-insights","effort_days":18},{"id":"arch","label":"Architecture options & ADR","phase":"discover","workstream":"eng","owner":"tech-lead","duration":10,"depends_on":["kickoff"],"status":"done","deliverable":"w-arch"},{"id":"proto","label":"Prototype core journeys","phase":"design","workstream":"ux","owner":"design-lead","duration":15,"depends_on":["g-discovery"],"status":"in_progress","progress":70,"deliverable":"w-proto","effort_days":25},{"id":"usability","label":"Usability testing (2 rounds)","phase":"design","workstream":"ux","owner":"design-lead","duration":8,"depends_on":[{"id":"proto","type":"SS","lag":8}],"status":"planned","deliverable":"w-proto"},{"id":"platform","label":"Platform, CI/CD & SSO","phase":"build","workstream":"eng","owner":"tech-lead","duration":15,"depends_on":["g-discovery"],"status":"in_progress","progress":40,"deliverable":"w-platform","effort_days":40},{"id":"account","label":"Account journey","phase":"build","workstream":"eng","owner":"dev-team","duration":15,"depends_on":["g-design","platform"],"deliverable":"w-journeys","effort_days":45},{"id":"billing","label":"Billing journey","phase":"build","workstream":"eng","owner":"dev-team","duration":20,"depends_on":["g-design","platform"],"deliverable":"w-journeys","effort_days":60},{"id":"cases","label":"Case management journey","phase":"build","workstream":"eng","owner":"dev-team","duration":15,"depends_on":["account"],"deliverable":"w-journeys","effort_days":45},{"id":"migration-design","label":"Migration mapping & dry run","phase":"build","workstream":"data","owner":"data-eng","duration":15,"depends_on":["arch"],"status":"at_risk","progress":20,"deliverable":"w-migration"},{"id":"a11y","label":"Accessibility audit & fixes","phase":"build","workstream":"ux","owner":"a11y-vendor","duration":10,"depends_on":["billing","cases"],"deliverable":"w-quality"},{"id":"uat","label":"User acceptance testing","phase":"launch","workstream":"eng","owner":"pm","duration":10,"depends_on":["a11y"],"deliverable":"w-quality"},{"id":"training","label":"Support team training","phase":"launch","workstream":"change","owner":"support-lead","duration":5,"depends_on":[{"id":"uat","type":"SS","lag":3}],"deliverable":"w-support"},{"id":"migrate","label":"Account migration waves","phase":"launch","workstream":"data","owner":"data-eng","duration":8,"depends_on":["g-golive","migration-design"],"deliverable":"w-migration"},{"id":"decom","label":"Decommission legacy portal","phase":"launch","workstream":"eng","owner":"tech-lead","duration":4,"depends_on":["migrate"],"deliverable":"w-transition"}],"milestones":[{"id":"g-discovery","label":"Discovery sign-off","phase":"discover","kind":"gate","owner":"sponsor","depends_on":["research","arch"],"achieved":true,"criteria":["Journeys prioritised","ADR approved"]},{"id":"g-design","label":"Design freeze","phase":"design","kind":"gate","owner":"design-lead","depends_on":["proto","usability"],"criteria":["SUS ≥ 75 in round 2"]},{"id":"g-golive","label":"Go-live","phase":"launch","kind":"launch","owner":"sponsor","depends_on":["uat","training"],"criteria":["UAT passed","0 critical a11y findings","Support trained"]},{"id":"g-close","label":"Project close","phase":"launch","kind":"delivery","owner":"pm","depends_on":["decom"]}],"governance":{"forums":[{"label":"Steering group","cadence":"Monthly","chair":"sponsor","members":["pm","tech-lead","support-lead"],"purpose":"Scope, budget and gate decisions."},{"label":"Delivery stand-up","cadence":"Daily","chair":"pm","members":["design-lead","tech-lead","dev-team","data-eng"],"purpose":"Blockers and plan changes."},{"label":"Design review","cadence":"Weekly","chair":"design-lead","members":["pm","tech-lead"],"purpose":"Approve journey designs before build."}],"escalation":"Stand-up → PM (same day) → Steering group (within 5 days)"},"raci":[{"activity":"Scope and budget changes","r":["pm"],"a":"sponsor","c":["tech-lead","design-lead"],"i":["steerco"]},{"activity":"Journey designs","r":["design-lead"],"a":"pm","c":["support-lead","tech-lead"],"i":["sponsor"]},{"activity":"Architecture & security","r":["tech-lead"],"a":"tech-lead","c":["security"],"i":["pm"]},{"activity":"Build & test","r":["dev-team"],"a":"tech-lead","c":["design-lead"],"i":["pm"]},{"activity":"Data migration","r":["data-eng"],"a":"tech-lead","c":["support-lead","security"],"i":["pm"]},{"activity":"Go-live decision","r":["pm"],"a":"sponsor","c":["tech-lead","support-lead","security"],"i":["steerco"]}],"risks":[{"id":"r1","title":"CRM API cannot handle peak load","likelihood":3,"impact":5,"owner":"tech-lead","mitigation":"Load test in sprint 2; add read cache.","status":"mitigating","affects":["billing","cases"]},{"id":"r2","title":"Migration data quality worse than sampled","likelihood":4,"impact":4,"owner":"data-eng","mitigation":"Full dry run on production copy; cleansing backlog.","status":"open","affects":["migration-design","migrate"]},{"id":"r3","title":"Design system components late","likelihood":3,"impact":3,"owner":"design-lead","mitigation":"Build local components behind the same API.","status":"open","affects":["account"]},{"id":"r4","title":"Accessibility findings need rework","likelihood":2,"impact":4,"owner":"design-lead","mitigation":"Early audit of prototypes.","affects":["a11y"]},{"id":"r5","title":"Support team capacity during training","likelihood":2,"impact":2,"owner":"support-lead","mitigation":"Train in two cohorts."},{"id":"i1","title":"SSO tenant not provisioned yet","type":"issue","likelihood":5,"impact":3,"owner":"pm","mitigation":"Escalated to IT; mock IdP meanwhile.","status":"open","affects":["platform"]}],"decisions":[{"id":"d1","title":"Phased or big-bang migration?","owner":"sponsor","due":"2026-11-13","status":"open","detail":"Phased adds 2 weeks but limits support load."},{"id":"d2","title":"Keep legacy read-only for 30 days?","owner":"tech-lead","due":"2027-01-15","status":"open"}],"budget":{"currency":"EUR","lines":[{"label":"Discovery & design","amount":70000,"phase":"discover"},{"label":"Build team","amount":240000,"phase":"build"},{"label":"Accessibility audit","amount":25000,"phase":"build"},{"label":"Launch & migration","amount":45000,"phase":"launch"},{"label":"Contingency","amount":40000}]}},"schedule":{"start":"2026-09-07","end":"2027-01-19","today":"2026-10-19","workdays":93,"progress":27,"criticalPath":["kickoff","research","g-discovery","proto","usability","g-design","account","cases","a11y","uat","g-golive","migrate","decom","g-close"],"nodes":{"kickoff":{"kind":"task","es":"2026-09-07","ef":"2026-09-09","ls":"2026-09-07","lf":"2026-09-09","dur":3,"slack":0,"critical":true,"late":false},"research":{"kind":"task","es":"2026-09-10","ef":"2026-09-25","ls":"2026-09-10","lf":"2026-09-25","dur":12,"slack":0,"critical":true,"late":false},"arch":{"kind":"task","es":"2026-09-10","ef":"2026-09-23","ls":"2026-09-14","lf":"2026-09-25","dur":10,"slack":2,"critical":false,"late":false},"proto":{"kind":"task","es":"2026-09-28","ef":"2026-10-16","ls":"2026-09-28","lf":"2026-10-16","dur":15,"slack":0,"critical":true,"late":true},"usability":{"kind":"task","es":"2026-10-08","ef":"2026-10-19","ls":"2026-10-08","lf":"2026-10-19","dur":8,"slack":0,"critical":true,"late":false},"platform":{"kind":"task","es":"2026-09-28","ef":"2026-10-16","ls":"2026-09-29","lf":"2026-10-19","dur":15,"slack":1,"critical":false,"late":true},"account":{"kind":"task","es":"2026-10-20","ef":"2026-11-09","ls":"2026-10-20","lf":"2026-11-09","dur":15,"slack":0,"critical":true,"late":false},"billing":{"kind":"task","es":"2026-10-20","ef":"2026-11-16","ls":"2026-11-03","lf":"2026-11-30","dur":20,"slack":10,"critical":false,"late":false},"cases":{"kind":"task","es":"2026-11-10","ef":"2026-11-30","ls":"2026-11-10","lf":"2026-11-30","dur":15,"slack":0,"critical":true,"late":false},"migration-design":{"kind":"task","es":"2026-09-24","ef":"2026-10-14","ls":"2026-12-08","lf":"2026-12-30","dur":15,"slack":53,"critical":false,"late":true},"a11y":{"kind":"task","es":"2026-12-01","ef":"2026-12-14","ls":"2026-12-01","lf":"2026-12-14","dur":10,"slack":0,"critical":true,"late":false},"uat":{"kind":"task","es":"2026-12-15","ef":"2026-12-30","ls":"2026-12-15","lf":"2026-12-30","dur":10,"slack":0,"critical":true,"late":false},"training":{"kind":"task","es":"2026-12-18","ef":"2026-12-28","ls":"2026-12-22","lf":"2026-12-30","dur":5,"slack":2,"critical":false,"late":false},"migrate":{"kind":"task","es":"2027-01-04","ef":"2027-01-13","ls":"2027-01-04","lf":"2027-01-13","dur":8,"slack":0,"critical":true,"late":false},"decom":{"kind":"task","es":"2027-01-14","ef":"2027-01-19","ls":"2027-01-14","lf":"2027-01-19","dur":4,"slack":0,"critical":true,"late":false},"g-discovery":{"kind":"milestone","es":"2026-09-25","ef":"2026-09-25","ls":"2026-09-25","lf":"2026-09-25","dur":0,"slack":0,"critical":true,"late":false},"g-design":{"kind":"milestone","es":"2026-10-19","ef":"2026-10-19","ls":"2026-10-19","lf":"2026-10-19","dur":0,"slack":0,"critical":true,"late":false},"g-golive":{"kind":"milestone","es":"2026-12-30","ef":"2026-12-30","ls":"2026-12-30","lf":"2026-12-30","dur":0,"slack":0,"critical":true,"late":false},"g-close":{"kind":"milestone","es":"2027-01-19","ef":"2027-01-19","ls":"2027-01-19","lf":"2027-01-19","dur":0,"slack":0,"critical":true,"late":false}},"phases":{"discover":{"start":"2026-09-07","end":"2026-09-25","progress":100,"workdays":15},"design":{"start":"2026-09-28","end":"2026-10-19","progress":46,"workdays":16},"build":{"start":"2026-09-24","end":"2026-12-14","progress":10,"workdays":58},"launch":{"start":"2026-12-15","end":"2027-01-19","progress":0,"workdays":22}},"calendar":{"workdays":[1,2,3,4,5],"holidays":["2026-12-24","2026-12-25","2026-12-31","2027-01-01"]}},"warnings":[]}</script>
+<script type="application/json" id="plan-data">{"generator":"planify 1.0.0","plan":{"schema_version":1,"plan_type":"project","meta":{"title":"Customer portal relaunch","subtitle":"Replace the legacy self-service portal with a new web app on the shared design system.","owner":"Head of Digital","status":"active","evidence":"illustrative","start":"2026-09-07","end":"2027-02-26","output":"examples/customer-portal.html","calendar":{"workdays":[1,2,3,4,5],"holidays":["2026-12-24","2026-12-25","2026-12-31","2027-01-01"]},"today":"2026-10-19"},"overview":{"goal":"Launch a self-service portal that resolves 60% of support requests without an agent by March 2027.","problem":"The legacy portal is unsupported, fails accessibility audits and pushes 70% of customers to the phone line.","scope":{"in":["Account, billing and case management journeys","Migration of active customer accounts","SSO with the corporate identity provider","WCAG 2.2 AA compliance"],"out":["Native mobile apps","Partner portal","Replacing the CRM"]},"success_criteria":[{"label":"Self-service resolution rate","target":"≥ 60%"},{"label":"Customer satisfaction (CSAT)","target":"≥ 4.3 / 5"},{"label":"Accessibility audit","target":"0 critical findings"},{"label":"Legacy portal","target":"Decommissioned"}],"assumptions":["The design system team delivers form components by October","CRM API rate limits allow 50 req/s"],"constraints":["Launch freeze from 18 Dec to 6 Jan","Budget fixed at €420k"]},"phases":[{"id":"discover","label":"Discovery","goal":"Validate journeys and pick the architecture.","owner":"pm"},{"id":"design","label":"Design","goal":"Tested prototypes for the three core journeys.","owner":"design-lead"},{"id":"build","label":"Build","goal":"Feature-complete portal in staging.","owner":"tech-lead"},{"id":"launch","label":"Launch","goal":"Customers migrated and legacy switched off.","owner":"pm"}],"workstreams":[{"id":"ux","label":"Experience","owner":"design-lead"},{"id":"eng","label":"Engineering","owner":"tech-lead"},{"id":"data","label":"Data & migration","owner":"data-eng"},{"id":"change","label":"Change & support","owner":"support-lead"}],"roles":[{"id":"sponsor","label":"Sponsor","person":"Head of Digital","kind":"sponsor"},{"id":"steerco","label":"Steering group","kind":"steering","reports_to":"sponsor"},{"id":"pm","label":"Project manager","person":"Alex","kind":"lead","reports_to":"steerco","fte":1},{"id":"design-lead","label":"Design lead","person":"Sam","kind":"lead","reports_to":"pm","fte":1},{"id":"tech-lead","label":"Tech lead","person":"Robin","kind":"lead","reports_to":"pm","fte":1},{"id":"dev-team","label":"Dev team (4)","kind":"team","reports_to":"tech-lead","fte":4},{"id":"data-eng","label":"Data engineer","person":"Kim","kind":"team","reports_to":"tech-lead","fte":1},{"id":"support-lead","label":"Support lead","person":"Jo","kind":"lead","reports_to":"pm","fte":0.5},{"id":"security","label":"Security office","kind":"stakeholder"},{"id":"a11y-vendor","label":"Accessibility auditor","org":"External","kind":"vendor","reports_to":"pm"}],"wbs":[{"id":"portal","label":"New customer portal","kind":"outcome"},{"id":"w-research","label":"Research & architecture","parent":"portal","kind":"deliverable"},{"id":"w-insights","label":"Journey insights report","parent":"w-research","kind":"work_package"},{"id":"w-arch","label":"Architecture decision record","parent":"w-research","kind":"work_package"},{"id":"w-experience","label":"Experience design","parent":"portal","kind":"deliverable"},{"id":"w-proto","label":"Tested prototypes","parent":"w-experience","kind":"work_package"},{"id":"w-app","label":"Portal application","parent":"portal","kind":"deliverable"},{"id":"w-platform","label":"Platform & SSO","parent":"w-app","kind":"work_package"},{"id":"w-journeys","label":"Account, billing, cases","parent":"w-app","kind":"work_package"},{"id":"w-quality","label":"Test & accessibility evidence","parent":"w-app","kind":"work_package"},{"id":"w-transition","label":"Transition","parent":"portal","kind":"deliverable"},{"id":"w-migration","label":"Migrated accounts","parent":"w-transition","kind":"work_package"},{"id":"w-support","label":"Support readiness","parent":"w-transition","kind":"work_package"}],"tasks":[{"id":"kickoff","label":"Kick-off & stakeholder map","phase":"discover","workstream":"change","owner":"pm","start":"2026-09-07","duration":3,"deliverable":"w-insights","status":"done","actual_start":"2026-09-07","actual_finish":"2026-09-09"},{"id":"research","label":"Customer interviews & analytics","phase":"discover","workstream":"ux","owner":"design-lead","duration":12,"depends_on":["kickoff"],"deliverable":"w-insights","effort_days":18,"status":"done","actual_start":"2026-09-10","actual_finish":"2026-09-30"},{"id":"arch","label":"Architecture options & ADR","phase":"discover","workstream":"eng","owner":"tech-lead","duration":10,"depends_on":["kickoff"],"deliverable":"w-arch","status":"done","actual_start":"2026-09-10","actual_finish":"2026-09-23"},{"id":"proto","label":"Prototype core journeys","phase":"design","workstream":"ux","owner":"design-lead","duration":15,"depends_on":["g-discovery"],"deliverable":"w-proto","effort_days":25,"status":"in_progress","actual_start":"2026-10-02","progress":55},{"id":"usability","label":"Usability testing (2 rounds)","phase":"design","workstream":"ux","owner":"design-lead","duration":8,"depends_on":[{"id":"proto","type":"SS","lag":8}],"deliverable":"w-proto","status":"in_progress","actual_start":"2026-10-13","progress":30},{"id":"platform","label":"Platform, CI/CD & SSO","phase":"build","workstream":"eng","owner":"tech-lead","duration":15,"depends_on":["g-discovery"],"deliverable":"w-platform","effort_days":40,"status":"in_progress","actual_start":"2026-10-02","progress":30},{"id":"account","label":"Account journey","phase":"build","workstream":"eng","owner":"dev-team","duration":15,"depends_on":["g-design","platform"],"deliverable":"w-journeys","effort_days":45},{"id":"billing","label":"Billing journey","phase":"build","workstream":"eng","owner":"dev-team","duration":20,"depends_on":["g-design","platform"],"deliverable":"w-journeys","effort_days":60},{"id":"cases","label":"Case management journey","phase":"build","workstream":"eng","owner":"dev-team","duration":15,"depends_on":["account"],"deliverable":"w-journeys","effort_days":45},{"id":"migration-design","label":"Migration mapping & dry run","phase":"build","workstream":"data","owner":"data-eng","duration":15,"depends_on":["arch"],"deliverable":"w-migration","status":"at_risk","actual_start":"2026-10-05","progress":15},{"id":"a11y","label":"Accessibility audit & fixes","phase":"build","workstream":"ux","owner":"a11y-vendor","duration":10,"depends_on":["billing","cases"],"deliverable":"w-quality"},{"id":"uat","label":"User acceptance testing","phase":"launch","workstream":"eng","owner":"pm","duration":10,"depends_on":["a11y"],"deliverable":"w-quality"},{"id":"training","label":"Support team training","phase":"launch","workstream":"change","owner":"support-lead","duration":5,"depends_on":[{"id":"uat","type":"SS","lag":3}],"deliverable":"w-support"},{"id":"migrate","label":"Account migration waves","phase":"launch","workstream":"data","owner":"data-eng","duration":8,"depends_on":["g-golive","migration-design"],"deliverable":"w-migration"},{"id":"decom","label":"Decommission legacy portal","phase":"launch","workstream":"eng","owner":"tech-lead","duration":4,"depends_on":["migrate"],"deliverable":"w-transition"}],"milestones":[{"id":"g-discovery","label":"Discovery sign-off","phase":"discover","kind":"gate","owner":"sponsor","depends_on":["research","arch"],"criteria":["Journeys prioritised","ADR approved"],"achieved":true,"achieved_on":"2026-10-01"},{"id":"g-design","label":"Design freeze","phase":"design","kind":"gate","owner":"design-lead","depends_on":["proto","usability"],"criteria":["SUS ≥ 75 in round 2"]},{"id":"g-golive","label":"Go-live","phase":"launch","kind":"launch","owner":"sponsor","depends_on":["uat","training"],"criteria":["UAT passed","0 critical a11y findings","Support trained"]},{"id":"g-close","label":"Project close","phase":"launch","kind":"delivery","owner":"pm","depends_on":["decom"]}],"governance":{"forums":[{"label":"Steering group","cadence":"Monthly","chair":"sponsor","members":["pm","tech-lead","support-lead"],"purpose":"Scope, budget and gate decisions."},{"label":"Delivery stand-up","cadence":"Daily","chair":"pm","members":["design-lead","tech-lead","dev-team","data-eng"],"purpose":"Blockers and plan changes."},{"label":"Design review","cadence":"Weekly","chair":"design-lead","members":["pm","tech-lead"],"purpose":"Approve journey designs before build."}],"escalation":"Stand-up → PM (same day) → Steering group (within 5 days)"},"raci":[{"activity":"Scope and budget changes","r":["pm"],"a":"sponsor","c":["tech-lead","design-lead"],"i":["steerco"]},{"activity":"Journey designs","r":["design-lead"],"a":"pm","c":["support-lead","tech-lead"],"i":["sponsor"]},{"activity":"Architecture & security","r":["tech-lead"],"a":"tech-lead","c":["security"],"i":["pm"]},{"activity":"Build & test","r":["dev-team"],"a":"tech-lead","c":["design-lead"],"i":["pm"]},{"activity":"Data migration","r":["data-eng"],"a":"tech-lead","c":["support-lead","security"],"i":["pm"]},{"activity":"Go-live decision","r":["pm"],"a":"sponsor","c":["tech-lead","support-lead","security"],"i":["steerco"]}],"risks":[{"id":"r1","title":"CRM API cannot handle peak load","likelihood":3,"impact":5,"owner":"tech-lead","mitigation":"Load test in sprint 2; add read cache.","status":"mitigating","affects":["billing","cases"]},{"id":"r2","title":"Migration data quality worse than sampled","likelihood":4,"impact":4,"owner":"data-eng","mitigation":"Full dry run on production copy; cleansing backlog.","status":"open","affects":["migration-design","migrate"]},{"id":"r3","title":"Design system components late","likelihood":3,"impact":3,"owner":"design-lead","mitigation":"Build local components behind the same API.","status":"open","affects":["account"]},{"id":"r4","title":"Accessibility findings need rework","likelihood":2,"impact":4,"owner":"design-lead","mitigation":"Early audit of prototypes.","affects":["a11y"]},{"id":"r5","title":"Support team capacity during training","likelihood":2,"impact":2,"owner":"support-lead","mitigation":"Train in two cohorts."},{"id":"i1","title":"SSO tenant not provisioned yet","type":"issue","likelihood":5,"impact":3,"owner":"pm","mitigation":"Escalated to IT; mock IdP meanwhile.","status":"open","affects":["platform"]}],"decisions":[{"id":"d1","title":"Phased or big-bang migration?","owner":"sponsor","due":"2026-11-13","status":"open","detail":"Phased adds 2 weeks but limits support load."},{"id":"d2","title":"Keep legacy read-only for 30 days?","owner":"tech-lead","due":"2027-01-15","status":"open"}],"budget":{"currency":"EUR","lines":[{"label":"Discovery & design","amount":70000,"phase":"discover"},{"label":"Build team","amount":240000,"phase":"build"},{"label":"Accessibility audit","amount":25000,"phase":"build"},{"label":"Launch & migration","amount":45000,"phase":"launch"},{"label":"Contingency","amount":40000}]},"baseline":{"label":"Approved plan","taken":"2026-09-04","end":"2027-01-19","nodes":{"kickoff":{"start":"2026-09-07","end":"2026-09-09"},"research":{"start":"2026-09-10","end":"2026-09-25"},"arch":{"start":"2026-09-10","end":"2026-09-23"},"proto":{"start":"2026-09-28","end":"2026-10-16"},"usability":{"start":"2026-10-08","end":"2026-10-19"},"platform":{"start":"2026-09-28","end":"2026-10-16"},"account":{"start":"2026-10-20","end":"2026-11-09"},"billing":{"start":"2026-10-20","end":"2026-11-16"},"cases":{"start":"2026-11-10","end":"2026-11-30"},"migration-design":{"start":"2026-09-24","end":"2026-10-14"},"a11y":{"start":"2026-12-01","end":"2026-12-14"},"uat":{"start":"2026-12-15","end":"2026-12-30"},"training":{"start":"2026-12-18","end":"2026-12-28"},"migrate":{"start":"2027-01-04","end":"2027-01-13"},"decom":{"start":"2027-01-14","end":"2027-01-19"},"g-discovery":{"start":"2026-09-25","end":"2026-09-25"},"g-design":{"start":"2026-10-19","end":"2026-10-19"},"g-golive":{"start":"2026-12-30","end":"2026-12-30"},"g-close":{"start":"2027-01-19","end":"2027-01-19"}}},"updates":[{"date":"2026-09-04","summary":"Baseline taken: Approved plan","finish":"2027-01-19","changes":[]},{"date":"2026-10-02","summary":"Discovery signed off","by":"Alex","finish":"2027-01-25","finish_was":"2027-01-19","changes":["Kick-off & stakeholder map finished on 9 Sep","Customer interviews & analytics finished on 30 Sep","Architecture options & ADR finished on 23 Sep","Prototype core journeys started on 2 Oct, 5% done","Platform, CI/CD & SSO started on 2 Oct, 5% done","Discovery sign-off achieved","Design freeze moves to 23 Oct (was 19 Oct)","Go-live moves to 7 Jan (was 30 Dec)","Project close moves to 25 Jan (was 19 Jan)"]},{"date":"2026-10-19","summary":"Week 6 status","by":"Alex","finish":"2027-02-02","finish_was":"2027-01-25","changes":["Prototype core journeys: 5% → 55% done","Usability testing (2 rounds) started on 13 Oct, 30% done","Platform, CI/CD & SSO: 5% → 30% done","Migration mapping & dry run started on 5 Oct, 15% done, at risk","Design freeze moves to 27 Oct (was 23 Oct)","Go-live moves to 15 Jan (was 7 Jan)","Project close moves to 2 Feb (was 25 Jan)","Risk mitigating: CRM API cannot handle peak load","Risk up 12 → 16: Migration data quality worse than sampled","New risk: SSO tenant not provisioned yet (15)"],"state":{"finish":"2027-02-02","tasks":{"kickoff":{"label":"Kick-off & stakeholder map","status":"done","progress":null,"actual_start":"2026-09-07","actual_finish":"2026-09-09","inputs":"[\"2026-09-07\",null,3,null,null]","ef":"2026-09-09"},"research":{"label":"Customer interviews & analytics","status":"done","progress":null,"actual_start":"2026-09-10","actual_finish":"2026-09-30","inputs":"[null,null,12,null,[\"kickoff\"]]","ef":"2026-09-30"},"arch":{"label":"Architecture options & ADR","status":"done","progress":null,"actual_start":"2026-09-10","actual_finish":"2026-09-23","inputs":"[null,null,10,null,[\"kickoff\"]]","ef":"2026-09-23"},"proto":{"label":"Prototype core journeys","status":"in_progress","progress":55,"actual_start":"2026-10-02","actual_finish":null,"inputs":"[null,null,15,null,[\"g-discovery\"]]","ef":"2026-10-27"},"usability":{"label":"Usability testing (2 rounds)","status":"in_progress","progress":30,"actual_start":"2026-10-13","actual_finish":null,"inputs":"[null,null,8,null,[{\"id\":\"proto\",\"type\":\"SS\",\"lag\":8}]]","ef":"2026-10-26"},"platform":{"label":"Platform, CI/CD & SSO","status":"in_progress","progress":30,"actual_start":"2026-10-02","actual_finish":null,"inputs":"[null,null,15,null,[\"g-discovery\"]]","ef":"2026-11-02"},"account":{"label":"Account journey","status":"planned","progress":null,"actual_start":null,"actual_finish":null,"inputs":"[null,null,15,null,[\"g-design\",\"platform\"]]","ef":"2026-11-23"},"billing":{"label":"Billing journey","status":"planned","progress":null,"actual_start":null,"actual_finish":null,"inputs":"[null,null,20,null,[\"g-design\",\"platform\"]]","ef":"2026-11-30"},"cases":{"label":"Case management journey","status":"planned","progress":null,"actual_start":null,"actual_finish":null,"inputs":"[null,null,15,null,[\"account\"]]","ef":"2026-12-14"},"migration-design":{"label":"Migration mapping & dry run","status":"at_risk","progress":15,"actual_start":"2026-10-05","actual_finish":null,"inputs":"[null,null,15,null,[\"arch\"]]","ef":"2026-11-04"},"a11y":{"label":"Accessibility audit & fixes","status":"planned","progress":null,"actual_start":null,"actual_finish":null,"inputs":"[null,null,10,null,[\"billing\",\"cases\"]]","ef":"2026-12-30"},"uat":{"label":"User acceptance testing","status":"planned","progress":null,"actual_start":null,"actual_finish":null,"inputs":"[null,null,10,null,[\"a11y\"]]","ef":"2027-01-15"},"training":{"label":"Support team training","status":"planned","progress":null,"actual_start":null,"actual_finish":null,"inputs":"[null,null,5,null,[{\"id\":\"uat\",\"type\":\"SS\",\"lag\":3}]]","ef":"2027-01-13"},"migrate":{"label":"Account migration waves","status":"planned","progress":null,"actual_start":null,"actual_finish":null,"inputs":"[null,null,8,null,[\"g-golive\",\"migration-design\"]]","ef":"2027-01-27"},"decom":{"label":"Decommission legacy portal","status":"planned","progress":null,"actual_start":null,"actual_finish":null,"inputs":"[null,null,4,null,[\"migrate\"]]","ef":"2027-02-02"}},"milestones":{"g-discovery":{"label":"Discovery sign-off","achieved":true,"ef":"2026-10-01"},"g-design":{"label":"Design freeze","achieved":false,"ef":"2026-10-27"},"g-golive":{"label":"Go-live","achieved":false,"ef":"2027-01-15"},"g-close":{"label":"Project close","achieved":false,"ef":"2027-02-02"}},"risks":{"r1":{"title":"CRM API cannot handle peak load","score":15,"status":"mitigating"},"r2":{"title":"Migration data quality worse than sampled","score":16,"status":"open"},"r3":{"title":"Design system components late","score":9,"status":"open"},"r4":{"title":"Accessibility findings need rework","score":8,"status":"open"},"r5":{"title":"Support team capacity during training","score":4,"status":"open"},"i1":{"title":"SSO tenant not provisioned yet","score":15,"status":"open"}},"decisions":{"d1":{"title":"Phased or big-bang migration?","status":"open"},"d2":{"title":"Keep legacy read-only for 30 days?","status":"open"}}}}]},"schedule":{"start":"2026-09-07","end":"2027-02-02","today":"2026-10-19","workdays":103,"progress":27,"criticalPath":["g-discovery","platform","account","cases","a11y","uat","g-golive","migrate","decom","g-close"],"nodes":{"kickoff":{"kind":"task","es":"2026-09-07","ef":"2026-09-09","ls":"2026-09-08","lf":"2026-09-10","dur":3,"slack":1,"critical":false,"late":false,"actual":true,"forecast":false,"base":{"es":"2026-09-07","ef":"2026-09-09"},"delta":0},"research":{"kind":"task","es":"2026-09-10","ef":"2026-09-30","ls":"2026-09-11","lf":"2026-10-01","dur":15,"slack":1,"critical":false,"late":false,"actual":true,"forecast":false,"base":{"es":"2026-09-10","ef":"2026-09-25"},"delta":3},"arch":{"kind":"task","es":"2026-09-10","ef":"2026-09-23","ls":"2026-09-18","lf":"2026-10-01","dur":10,"slack":6,"critical":false,"late":false,"actual":true,"forecast":false,"base":{"es":"2026-09-10","ef":"2026-09-23"},"delta":0},"proto":{"kind":"task","es":"2026-10-02","ef":"2026-10-27","ls":"2026-10-08","lf":"2026-11-02","dur":18,"slack":4,"critical":false,"late":false,"actual":true,"forecast":true,"base":{"es":"2026-09-28","ef":"2026-10-16"},"delta":7,"expected":100,"reported":55,"behind":true},"usability":{"kind":"task","es":"2026-10-13","ef":"2026-10-26","ls":"2026-10-20","lf":"2026-11-02","dur":10,"slack":5,"critical":false,"late":false,"actual":true,"forecast":true,"base":{"es":"2026-10-08","ef":"2026-10-19"},"delta":5,"expected":100,"reported":30,"behind":true},"platform":{"kind":"task","es":"2026-10-02","ef":"2026-11-02","ls":"2026-10-02","lf":"2026-11-02","dur":22,"slack":0,"critical":true,"late":false,"actual":true,"forecast":true,"base":{"es":"2026-09-28","ef":"2026-10-16"},"delta":11,"expected":100,"reported":30,"behind":true},"account":{"kind":"task","es":"2026-11-03","ef":"2026-11-23","ls":"2026-11-03","lf":"2026-11-23","dur":15,"slack":0,"critical":true,"late":false,"actual":false,"forecast":false,"base":{"es":"2026-10-20","ef":"2026-11-09"},"delta":10},"billing":{"kind":"task","es":"2026-11-03","ef":"2026-11-30","ls":"2026-11-17","lf":"2026-12-14","dur":20,"slack":10,"critical":false,"late":false,"actual":false,"forecast":false,"base":{"es":"2026-10-20","ef":"2026-11-16"},"delta":10},"cases":{"kind":"task","es":"2026-11-24","ef":"2026-12-14","ls":"2026-11-24","lf":"2026-12-14","dur":15,"slack":0,"critical":true,"late":false,"actual":false,"forecast":false,"base":{"es":"2026-11-10","ef":"2026-11-30"},"delta":10},"migration-design":{"kind":"task","es":"2026-10-05","ef":"2026-11-04","ls":"2026-12-10","lf":"2027-01-15","dur":23,"slack":48,"critical":false,"late":false,"actual":true,"forecast":true,"base":{"es":"2026-09-24","ef":"2026-10-14"},"delta":15,"expected":100,"reported":15,"behind":true},"a11y":{"kind":"task","es":"2026-12-15","ef":"2026-12-30","ls":"2026-12-15","lf":"2026-12-30","dur":10,"slack":0,"critical":true,"late":false,"actual":false,"forecast":false,"base":{"es":"2026-12-01","ef":"2026-12-14"},"delta":10},"uat":{"kind":"task","es":"2027-01-04","ef":"2027-01-15","ls":"2027-01-04","lf":"2027-01-15","dur":10,"slack":0,"critical":true,"late":false,"actual":false,"forecast":false,"base":{"es":"2026-12-15","ef":"2026-12-30"},"delta":10},"training":{"kind":"task","es":"2027-01-07","ef":"2027-01-13","ls":"2027-01-11","lf":"2027-01-15","dur":5,"slack":2,"critical":false,"late":false,"actual":false,"forecast":false,"base":{"es":"2026-12-18","ef":"2026-12-28"},"delta":10},"migrate":{"kind":"task","es":"2027-01-18","ef":"2027-01-27","ls":"2027-01-18","lf":"2027-01-27","dur":8,"slack":0,"critical":true,"late":false,"actual":false,"forecast":false,"base":{"es":"2027-01-04","ef":"2027-01-13"},"delta":10},"decom":{"kind":"task","es":"2027-01-28","ef":"2027-02-02","ls":"2027-01-28","lf":"2027-02-02","dur":4,"slack":0,"critical":true,"late":false,"actual":false,"forecast":false,"base":{"es":"2027-01-14","ef":"2027-01-19"},"delta":10},"g-discovery":{"kind":"milestone","es":"2026-10-01","ef":"2026-10-01","ls":"2026-10-01","lf":"2026-10-01","dur":0,"slack":0,"critical":true,"late":false,"actual":true,"forecast":false,"base":{"es":"2026-09-25","ef":"2026-09-25"},"delta":4},"g-design":{"kind":"milestone","es":"2026-10-27","ef":"2026-10-27","ls":"2026-11-02","lf":"2026-11-02","dur":0,"slack":4,"critical":false,"late":false,"actual":false,"forecast":false,"base":{"es":"2026-10-19","ef":"2026-10-19"},"delta":6},"g-golive":{"kind":"milestone","es":"2027-01-15","ef":"2027-01-15","ls":"2027-01-15","lf":"2027-01-15","dur":0,"slack":0,"critical":true,"late":false,"actual":false,"forecast":false,"base":{"es":"2026-12-30","ef":"2026-12-30"},"delta":10},"g-close":{"kind":"milestone","es":"2027-02-02","ef":"2027-02-02","ls":"2027-02-02","lf":"2027-02-02","dur":0,"slack":0,"critical":true,"late":false,"actual":false,"forecast":false,"base":{"es":"2027-01-19","ef":"2027-01-19"},"delta":10}},"phases":{"discover":{"start":"2026-09-07","end":"2026-10-01","progress":100,"workdays":19},"design":{"start":"2026-10-02","end":"2026-10-27","progress":46,"workdays":18},"build":{"start":"2026-10-02","end":"2026-12-30","progress":10,"workdays":62},"launch":{"start":"2027-01-04","end":"2027-02-02","progress":0,"workdays":22}},"tracking":true,"baseline":{"label":"Approved plan","taken":"2026-09-04","end":"2027-01-19","delta":10},"calendar":{"workdays":[1,2,3,4,5],"holidays":["2026-12-24","2026-12-25","2026-12-31","2027-01-01"]}},"warnings":[]}</script>
 <script>
 // Working-day calendar. All dates are plain ISO days (YYYY-MM-DD) handled in UTC
 // so a plan renders the same in every time zone.
@@ -463,6 +480,12 @@ function schedule(plan) {
   const order = topo(nodes, errors);
   if (!order) return { errors, warnings };
 
+  // A plan with a baseline is under tracking: recorded actuals replace planned dates, and
+  // unfinished work is forecast from today, because nothing can still happen in the past.
+  const today = plan.meta.today || new Date().toISOString().slice(0, 10);
+  const tracking = !!plan.baseline;
+  const todayWd = cal.snapForward(today);
+
   // ---- forward pass ----------------------------------------------------------
   for (const id of order) {
     const n = nodes.get(id);
@@ -470,7 +493,9 @@ function schedule(plan) {
     if (n.kind === 'milestone') {
       let earliest = null;
       for (const d of n.deps) earliest = later(earliest, cal.shift(nodes.get(d.id).ef, d.lag));
-      if (s.date) {
+      if (s.achieved_on) {
+        n.es = n.ef = s.achieved_on;
+      } else if (s.date) {
         n.es = n.ef = s.date;
         if (earliest && toMs(s.date) < toMs(earliest)) {
           errors.push({ code: 'plan/dependency-violation', path: `$.milestones[id=${id}].date`, message: `Milestone "${id}" is fixed on ${s.date} but its dependencies finish ${earliest}.`, fix: `Move the date to ${earliest} or later, shorten the work before it, or drop the date to let it follow the work.` });
@@ -478,6 +503,7 @@ function schedule(plan) {
       } else {
         n.es = n.ef = earliest;
       }
+      if (tracking && !s.achieved && !s.achieved_on && !s.date && toMs(n.ef) < toMs(today)) n.es = n.ef = todayWd;
       n.dur = 0;
       continue;
     }
@@ -495,20 +521,37 @@ function schedule(plan) {
       c = cal.snapForward(c);
       required = later(required, c);
     }
-    if (required && toMs(required) > toMs(es)) {
+    const done = isDone(s);
+    const started = !!s.actual_start || s.status === 'in_progress' || (Number.isFinite(s.progress) && s.progress > 0);
+    if (s.actual_start) {
+      // Recorded history wins over the plan; dependencies no longer constrain a start that happened.
+      es = cal.snapForward(s.actual_start);
+    } else if (required && toMs(required) > toMs(es)) {
       if (s.start) {
         errors.push({ code: 'plan/dependency-violation', path: `$.tasks[id=${id}].start`, message: `Task "${id}" starts ${s.start} but its dependencies allow ${required} at the earliest.`, fix: `Start it on ${required} or later, or remove "start" so the scheduler places it after its dependencies.` });
       } else {
         es = required;
       }
     }
+    if (tracking && !done && !started && s.status !== 'cancelled' && toMs(es) < toMs(todayWd)) { es = todayWd; n.pushed = true; }
     n.es = es;
-    if (s.end) {
+    if (s.actual_finish) {
+      n.ef = cal.snapBack(s.actual_finish);
+      if (toMs(n.ef) < toMs(es)) n.ef = es;
+      n.dur = Math.max(1, cal.count(es, n.ef));
+    } else if (s.end) {
       n.ef = cal.snapBack(s.end);
       n.dur = Math.max(1, cal.count(es, n.ef));
     } else {
       n.dur = Math.max(1, Math.ceil(s.duration));
       n.ef = cal.endOf(es, n.dur);
+    }
+    n.planDur = n.dur;
+    // Work in progress cannot finish before the remaining share of it is done, counted from today.
+    if (tracking && !done && started && toMs(todayWd) > toMs(es)) {
+      const remaining = Math.max(1, Math.ceil(n.planDur * (1 - progressOf(s) / 100)));
+      const forecast = cal.endOf(todayWd, remaining);
+      if (toMs(forecast) > toMs(n.ef)) { n.ef = forecast; n.dur = cal.count(es, n.ef); n.forecast = true; }
     }
   }
   if (errors.length) return { errors, warnings };
@@ -538,15 +581,34 @@ function schedule(plan) {
   }
 
   // ---- roll-ups --------------------------------------------------------------
-  const today = plan.meta.today || new Date().toISOString().slice(0, 10);
+  const wdDiff = (a, b) => (toMs(b) >= toMs(a) ? cal.count(a, b) - 1 : -(cal.count(b, a) - 1));
+  const base = plan.baseline?.nodes || {};
   const out = {};
   for (const n of nodes.values()) {
     const status = n.src.status || (n.kind === 'milestone' ? undefined : 'planned');
-    const done = status === 'done' || (n.kind === 'task' && n.src.progress === 100);
-    out[n.id] = {
+    const done = n.kind === 'task' ? isDone(n.src) : !!(n.src.achieved || n.src.achieved_on);
+    const o = {
       kind: n.kind, es: n.es, ef: n.ef, ls: n.ls, lf: n.lf, dur: n.dur, slack: n.slack, critical: n.critical,
-      late: !done && status !== 'cancelled' && toMs(n.ef) < toMs(today) && (n.kind === 'task' || !n.src.achieved),
+      late: !done && status !== 'cancelled' && toMs(n.ef) < toMs(today),
+      actual: !!(n.src.actual_start || n.src.actual_finish || n.src.achieved_on),
+      forecast: !!(n.forecast || n.pushed),
     };
+    const b = base[n.id];
+    if (b) {
+      o.base = { es: b.start, ef: b.end };
+      o.delta = wdDiff(b.end, n.ef);
+    }
+    // Pace: how far through its (baseline, else planned) window the task should be by today, against what is reported.
+    if (n.kind === 'task' && !done && status !== 'cancelled') {
+      const ws = b ? b.start : n.es, we = b ? b.end : cal.endOf(n.es, n.planDur);
+      if (toMs(today) >= toMs(ws)) {
+        const total = Math.max(1, cal.count(ws, we));
+        o.expected = Math.min(100, Math.round((cal.count(ws, earlier(today, we)) / total) * 100));
+        o.reported = progressOf(n.src);
+        o.behind = o.expected - o.reported >= 20;
+      }
+    }
+    out[n.id] = o;
   }
 
   const phases = {};
@@ -572,15 +634,21 @@ function schedule(plan) {
       workdays: cal.count(projectStart, projectEnd),
       progress: w ? Math.round(p / w) : 0,
       criticalPath: order.filter((id) => out[id].critical),
-      nodes: out, phases,
+      nodes: out, phases, tracking,
+      baseline: plan.baseline ? { label: plan.baseline.label, taken: plan.baseline.taken, end: plan.baseline.end, delta: wdDiff(plan.baseline.end, projectEnd) } : null,
       calendar: { workdays: [...cal.workdays], holidays: [...cal.holidays] },
     },
   };
 }
 
+function isDone(t) {
+  return t.status === 'done' || !!t.actual_finish || t.progress === 100;
+}
+
 function progressOf(t) {
+  if (t.actual_finish || t.status === 'done') return 100;
   if (Number.isFinite(t.progress)) return t.progress;
-  return t.status === 'done' ? 100 : 0;
+  return 0;
 }
 
 function normDeps(deps = []) {
@@ -883,6 +951,10 @@ function planToCsv(plan, sched) {
     } else {
       head = `Finishes <b>${fmtY(S.end)}</b>, ${plural(S.workdays, 'working day')} after it starts.`;
     }
+    if (S.baseline) {
+      const d = S.baseline.delta;
+      head += ` <span class="drift ${d > 0 ? 'bad' : 'ok'}">${d === 0 ? 'On' : `${plural(Math.abs(d), 'working day')} ${d > 0 ? 'later than' : 'earlier than'}`} the baseline.</span>`;
+    }
     const drivers = S.criticalPath.filter((id) => S.nodes[id].kind === 'task' && items.get(id).status !== 'done' && items.get(id).status !== 'cancelled');
     const nextMs = milestones.map((m) => ({ m, d: S.nodes[m.id].ef })).filter((x) => !x.m.achieved && ms(x.d) >= ms(S.today)).sort((a, b) => ms(a.d) - ms(b.d))[0];
     return { head, drivers, nextMs };
@@ -895,21 +967,28 @@ function planToCsv(plan, sched) {
     const highRisks = (plan.risks || []).filter((r) => r.status !== 'closed' && riskScore(r) >= 10).length;
     const openDecisions = (plan.decisions || []).filter((d) => !d.status || d.status === 'open');
     const dueSoon = openDecisions.filter((d) => d.due && nextMs && ms(d.due) <= ms(nextMs.d)).length;
+    const behind = Object.values(S.nodes).filter((n) => n.behind).length;
+    const slipped = Object.values(S.nodes).filter((n) => n.kind === 'task' && n.delta > 0 && !n.actual).length;
+    const updates = plan.updates || [];
+    const lastUpdate = updates[updates.length - 1];
     const shown = drivers.slice(0, 5);
     const driverHtml = shown.map((id) => `<button class="link" data-goto="${esc(id)}">${esc(items.get(id).label)}</button>`).join('<span class="arrow">→</span>') + (drivers.length > shown.length ? `<span class="muted"> and ${drivers.length - shown.length} more</span>` : '');
 
     const attention = [
-      late ? `<button class="attn bad" data-only="late">${plural(late, 'item')} behind schedule</button>` : '',
+      !S.tracking && late ? `<button class="attn bad" data-only="late">${plural(late, 'item')} behind schedule</button>` : '',
+      behind ? `<button class="attn bad" data-only="pace">${plural(behind, 'task')} behind pace</button>` : '',
+      slipped ? `<button class="attn warn" data-only="slip">${plural(slipped, 'task')} finishing later than baseline</button>` : '',
       highRisks ? `<button class="attn warn" data-view-go="risks">${plural(highRisks, 'high risk')} open</button>` : '',
       openDecisions.length ? `<button class="attn" data-scroll="decisions">${plural(openDecisions.length, 'decision')} needed${dueSoon ? `, ${dueSoon} before the next milestone` : ''}</button>` : '',
     ].filter(Boolean).join('');
 
     el.innerHTML = `
       <div class="panel verdict">
-        <div class="eyebrow">${SIM.active() ? 'What-if, not saved' : `As of ${fmtY(S.today)}`} · ${S.progress}% of planned work done</div>
+        <div class="eyebrow">${SIM.active() ? 'What-if, not saved' : `As of ${fmtY(S.today)}`} · ${S.progress}% of planned work done${S.baseline ? ` · measured against “${esc(S.baseline.label)}”, ${fmt(S.baseline.taken)}` : ''}</div>
         <p class="headline">${head}</p>
         ${drivers.length ? `<p class="drivers"><span class="muted">The date is set by</span> ${driverHtml}. <span class="muted">A slip in any of these moves the finish.</span></p>` : ''}
         ${nextMs ? `<p class="next"><span class="muted">Next milestone</span> <b>${esc(nextMs.m.label)}</b> on ${fmt(nextMs.d)}${ms(nextMs.d) > ms(S.today) ? `, in ${plural(wdDiff(S.today, nextMs.d), 'working day')}` : ', today'}.</p>` : ''}
+        ${lastUpdate && lastUpdate.changes?.length ? `<p class="next"><span class="muted">Since the last update</span> <button class="link" data-scroll="history">${plural(lastUpdate.changes.length, 'change')}</button>${lastUpdate.finish_was && lastUpdate.finish_was !== lastUpdate.finish ? `, finish ${wdDiff(lastUpdate.finish_was, lastUpdate.finish) > 0 ? '+' : '−'}${plural(Math.abs(wdDiff(lastUpdate.finish_was, lastUpdate.finish)), 'working day')}` : ', finish unchanged'} <span class="muted">(${fmt(lastUpdate.date)}${lastUpdate.summary ? `, ${esc(lastUpdate.summary)}` : ''})</span>.</p>` : ''}
         ${attention ? `<div class="attn-row">${attention}</div>` : '<div class="attn-row"><span class="attn ok">Nothing is behind schedule</span></div>'}
         ${miniTimeline()}
       </div>
@@ -921,6 +1000,7 @@ function planToCsv(plan, sched) {
           ${ov.success_criteria?.length ? `<table class="criteria"><tbody>${ov.success_criteria.map((c) => `<tr><td>${esc(c.label)}</td><td class="num">${esc(c.target || '')}</td></tr>`).join('')}</tbody></table>` : ''}
         </div>
         <div class="panel"><h2>Milestones</h2>${milestoneList()}</div>
+        ${updates.length ? historyPanel(updates) : ''}
         <div class="panel">
           <h2>Scope</h2>
           ${ov.scope?.in?.length ? `<ul class="scope in">${ov.scope.in.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>` : ''}
@@ -931,6 +1011,15 @@ function planToCsv(plan, sched) {
         ${ov.assumptions?.length || ov.constraints?.length ? `<div class="panel">${ov.assumptions?.length ? `<h2>Assumptions</h2><ul class="clean">${ov.assumptions.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>` : ''}${ov.constraints?.length ? `<h2 style="margin-top:16px">Constraints</h2><ul class="clean">${ov.constraints.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>` : ''}</div>` : ''}
         ${plan.budget?.lines?.length ? renderBudget() : ''}
       </div>`;
+  }
+
+  // Newest first; each update says what moved and what it did to the finish date.
+  function historyPanel(updates) {
+    return `<div class="panel" id="history"><h2>Progress log</h2><ol class="history">${[...updates].reverse().map((u) => {
+      const d = u.finish_was ? wdDiff(u.finish_was, u.finish) : 0;
+      const changes = u.changes || [];
+      return `<li><div class="h-head"><span class="when">${fmt(u.date)}</span><b>${esc(u.summary || 'Update')}</b>${u.by ? `<span class="muted small"> · ${esc(u.by)}</span>` : ''}${u.finish_was ? `<span class="h-delta ${d > 0 ? 'bad' : d < 0 ? 'ok' : 'muted'}">${d === 0 ? 'finish unchanged' : `finish ${d > 0 ? '+' : '−'}${Math.abs(d)}d → ${fmt(u.finish)}`}</span>` : `<span class="h-delta muted">finish ${fmt(u.finish)}</span>`}</div>${changes.length ? `<ul>${changes.slice(0, 4).map((c) => `<li>${esc(c)}</li>`).join('')}</ul>${changes.length > 4 ? `<details><summary>${changes.length - 4} more</summary><ul>${changes.slice(4).map((c) => `<li>${esc(c)}</li>`).join('')}</ul></details>` : ''}` : ''}</li>`;
+    }).join('')}</ol></div>`;
   }
 
   // Phases drawn to scale with milestones and today on the same line; a phase opens the roadmap focused on it.
@@ -961,7 +1050,8 @@ function planToCsv(plan, sched) {
     if (!milestones.length) return '<p class="muted small">No milestones yet. Give each phase an exit gate with criteria.</p>';
     return `<ol class="ms-list">${milestones.map((m) => ({ m, n: S.nodes[m.id] })).sort((a, b) => ms(a.n.ef) - ms(b.n.ef)).map(({ m, n }) => {
       const state = m.achieved ? 'ok' : n.late ? 'bad' : ms(n.ef) < ms(S.today) ? '' : 'todo';
-      return `<li class="${state}"><span class="when">${fmt(n.ef)}</span><span><button class="link strong" data-goto="${esc(m.id)}">${esc(m.label)}</button>${m.achieved ? ' <span class="tag ok">achieved</span>' : n.late ? ' <span class="tag bad">late</span>' : ''}${m.criteria?.length ? `<span class="small muted block">${m.criteria.map(esc).join(' · ')}</span>` : ''}</span></li>`;
+      const moved = n.base && n.delta ? ` <span class="tag ${n.delta > 0 ? 'bad' : 'ok'}" title="Baseline ${fmt(n.base.ef)}">${n.delta > 0 ? '+' : '−'}${Math.abs(n.delta)}d</span>` : '';
+      return `<li class="${state}"><span class="when">${fmt(n.ef)}${moved}</span><span><button class="link strong" data-goto="${esc(m.id)}">${esc(m.label)}</button>${m.achieved ? ' <span class="tag ok">achieved</span>' : n.late ? ' <span class="tag bad">late</span>' : ''}${m.criteria?.length ? `<span class="small muted block">${m.criteria.map(esc).join(' · ')}</span>` : ''}</span></li>`;
     }).join('')}</ol>`;
   }
 
@@ -974,8 +1064,8 @@ function planToCsv(plan, sched) {
   }
 
   // ---- roadmap (Gantt) ------------------------------------------------------
-  const G = { group: 'phase', zoom: null, deps: true, crit: true, filter: '', only: null, collapsed: new Set(), selected: null };
-  const onlyLabel = () => !G.only ? '' : G.only.kind === 'late' ? 'Behind schedule' : G.only.kind === 'critical' ? 'Critical path' : `${roleName(G.only.id)}${roles.get(G.only.id)?.person ? ` (${roles.get(G.only.id).person})` : ''}`;
+  const G = { group: 'phase', zoom: null, deps: true, crit: true, base: true, filter: '', only: null, collapsed: new Set(), selected: null };
+  const onlyLabel = () => !G.only ? '' : G.only.kind === 'late' ? 'Behind schedule' : G.only.kind === 'pace' ? 'Behind pace' : G.only.kind === 'slip' ? 'Later than baseline' : G.only.kind === 'critical' ? 'Critical path' : `${roleName(G.only.id)}${roles.get(G.only.id)?.person ? ` (${roles.get(G.only.id).person})` : ''}`;
   function renderRoadmap() {
     const el = $('#view-roadmap');
     const span = (ms(S.end) - ms(S.start)) / DAY;
@@ -987,6 +1077,7 @@ function planToCsv(plan, sched) {
         <span><span class="ctl-label">Scale</span><span class="seg-ctl" id="g-zoom">${['week', 'month', 'quarter'].map((k) => `<button data-v="${k}" aria-pressed="${G.zoom === k}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('')}</span></span>
         <label class="check"><input type="checkbox" id="g-deps" ${G.deps ? 'checked' : ''}> Dependencies</label>
         <label class="check"><input type="checkbox" id="g-crit" ${G.crit ? 'checked' : ''}> Critical path</label>
+        ${S.baseline ? `<label class="check"><input type="checkbox" id="g-base" ${G.base ? 'checked' : ''}> Baseline</label>` : ''}
         <input type="search" id="g-filter" placeholder="Find a task or person" aria-label="Find a task or person" value="${esc(G.filter)}">
         ${G.only ? `<button class="only-chip" id="g-only" aria-label="Show everything">Showing: ${esc(onlyLabel())} <span aria-hidden="true">×</span></button>` : `<button class="btn quiet" data-only="critical">Only the critical path</button>`}
       </div>
@@ -999,12 +1090,14 @@ function planToCsv(plan, sched) {
         <span><i style="border:1.6px dashed var(--bad);background:none"></i>Behind schedule</span>
         <span><i style="background:none;border-left:2px dashed var(--today);width:2px;border-radius:0"></i>Today</span>
         <span><svg width="10" height="10" style="vertical-align:middle;margin-right:6px"><circle cx="5" cy="5" r="4" fill="var(--bad)"/></svg>High risk attached</span>
-        <span class="sim-only"><i style="border:1.5px dashed var(--ink-3);background:none"></i>Original dates</span>
+        <span class="sim-only"><i style="border:1.5px dashed var(--ink-3);background:none"></i>Before this what-if</span>
+        ${S.baseline ? `<span><i style="height:4px;background:var(--ink-3);opacity:.55"></i>Baseline: ${esc(S.baseline.label)}</span><span><i style="background:repeating-linear-gradient(135deg,var(--ink-3) 0 2px,transparent 2px 5px);opacity:.6"></i>Forecast beyond plan</span>` : ''}
       </div>`;
     $$('#g-group button').forEach((b) => b.addEventListener('click', () => { G.group = b.dataset.v; G.collapsed.clear(); renderRoadmap(); }));
     $$('#g-zoom button').forEach((b) => b.addEventListener('click', () => { G.zoom = b.dataset.v; renderRoadmap(); }));
     $('#g-deps').addEventListener('change', (e) => { G.deps = e.target.checked; $('#gantt').classList.toggle('hide-deps', !G.deps); });
     $('#g-crit').addEventListener('change', (e) => { G.crit = e.target.checked; $('#gantt').classList.toggle('hide-crit', !G.crit); });
+    $('#g-base')?.addEventListener('change', (e) => { G.base = e.target.checked; $('#gantt').classList.toggle('hide-base', !G.base); });
     $('#g-filter').addEventListener('input', (e) => { G.filter = e.target.value; drawGantt(); });
     $('#g-only')?.addEventListener('click', (e) => { e.stopPropagation(); G.only = null; renderRoadmap(); });
     drawGantt();
@@ -1041,6 +1134,8 @@ function planToCsv(plan, sched) {
     const match = (it) => {
       const n = S.nodes[it.id];
       if (G.only?.kind === 'late' && !n.late) return false;
+      if (G.only?.kind === 'pace' && !n.behind) return false;
+      if (G.only?.kind === 'slip' && !(n.delta > 0 && !n.actual)) return false;
       if (G.only?.kind === 'critical' && !n.critical) return false;
       if (G.only?.kind === 'owner' && it.owner !== G.only.id) return false;
       return !q || [it.label, it.id, who(it.owner), roleName(it.owner), it.detail].some((s) => String(s || '').toLowerCase().includes(q));
@@ -1134,23 +1229,26 @@ function planToCsv(plan, sched) {
       const movedFromBase = SIM.active() && (b0.es !== n.es || b0.ef !== n.ef);
       if (it.kind === 'milestone') {
         const mx = x(n.ef) + dayW / 2;
+        if (n.base && n.base.ef !== n.ef) { const bxm = x(n.base.ef) + dayW / 2; out.push(`<path class="g-baseline" d="M${bxm} ${cy + 6} L${bxm + 4} ${cy + 10} L${bxm} ${cy + 14} L${bxm - 4} ${cy + 10}Z"/>`); }
         if (movedFromBase) { const gx = x(b0.ef) + dayW / 2; out.push(`<path class="g-ghost" d="M${gx} ${cy - 7} L${gx + 7} ${cy} L${gx} ${cy + 7} L${gx - 7} ${cy}Z"/>`); }
         out.push(`<g class="g-ms ${cls}" data-id="${esc(it.id)}"><path d="M${mx} ${cy - 8} L${mx + 8} ${cy} L${mx} ${cy + 8} L${mx - 8} ${cy}Z" fill="${it.achieved ? 'var(--ok)' : color}"/></g>`);
         out.push(`<text class="g-bar-text" x="${mx + 13}" y="${cy + 4}">${esc(fmt(n.ef))}${ownerTxt ? ' · ' + esc(ownerTxt) : ''}</text>`);
       } else {
         const bx = x(n.es), bw = Math.max(dayW, x(n.ef) + dayW - x(n.es));
         const prog = Number.isFinite(it.progress) ? it.progress : it.status === 'done' ? 100 : 0;
+        if (n.base) out.push(`<rect class="g-baseline" x="${x(n.base.es)}" y="${cy + 9}" width="${Math.max(dayW, x(n.base.ef) + dayW - x(n.base.es))}" height="3" rx="1.5"/>`);
         if (movedFromBase) out.push(`<rect class="g-ghost" x="${x(b0.es)}" y="${cy - 9}" width="${Math.max(dayW, x(b0.ef) + dayW - x(b0.es))}" height="18" rx="5"/>`);
         out.push(`<g class="g-bar ${cls}${SIM.over[it.id] ? ' changed' : ''}" data-id="${esc(it.id)}" tabindex="0" role="button" aria-label="${esc(it.label)}, ${fmt(n.es)} to ${fmt(n.ef)}, ${n.dur} working days${n.critical ? ', critical path' : ''}">`);
         out.push(`<rect class="track" x="${bx}" y="${cy - 8}" width="${bw}" height="16" rx="4" fill="${color}"/>`);
         if (prog > 0) out.push(`<rect x="${bx}" y="${cy - 8}" width="${(bw * prog) / 100}" height="16" rx="4" fill="${color}"/>`);
+        if (n.forecast && n.base && ms(n.ef) > ms(n.base.ef)) { const fx = Math.max(bx, x(n.base.ef) + dayW); out.push(`<rect class="g-forecast" x="${fx}" y="${cy - 8}" width="${bx + bw - fx}" height="16" rx="4"/>`); }
         out.push(`<rect class="edge" x="${bx}" y="${cy - 8}" width="${bw}" height="16" rx="4"/>`);
         out.push(`<rect class="grip" x="${bx + bw - 4}" y="${cy - 6}" width="3" height="12" rx="1.5"/>`);
         out.push('</g>');
         const risk = riskOf.get(it.id);
         const hot = risk && riskScore(risk) >= 10;
         if (hot) out.push(`<circle class="g-risk" cx="${bx + bw + 9}" cy="${cy}" r="4" fill="${riskScore(risk) >= 15 ? 'var(--bad)' : 'var(--warn)'}"><title>${esc(risk.title)} (risk ${riskScore(risk)})</title></circle>`);
-        out.push(`<text class="g-bar-text" x="${bx + bw + (hot ? 18 : 6)}" y="${cy + 4}">${ownerTxt ? esc(ownerTxt) : ''}${it.status && it.status !== 'planned' ? `${ownerTxt ? ' · ' : ''}${esc(it.status.replace('_', ' '))}` : ''}${prog > 0 && prog < 100 ? ` ${prog}%` : ''}</text>`);
+        out.push(`<text class="g-bar-text" x="${bx + bw + (hot ? 18 : 6)}" y="${cy + 4}">${ownerTxt ? esc(ownerTxt) : ''}${it.status && it.status !== 'planned' ? `${ownerTxt ? ' · ' : ''}${esc(it.status.replace('_', ' '))}` : ''}${prog > 0 && prog < 100 ? ` ${prog}%` : ''}${n.behind ? ` <tspan class="bad">· behind pace (${n.expected}% expected)</tspan>` : ''}</text>`);
       }
       out.push('</g>');
     }
@@ -1200,6 +1298,7 @@ function planToCsv(plan, sched) {
     };
     wrap.onscroll = pin;
     wrap.classList.toggle('hide-crit', !G.crit);
+    wrap.classList.toggle('hide-base', !G.base);
 
     // scroll to today on first draw when the project is underway
     if (!wrap.dataset.scrolled && todayX - labelW > (wrap.clientWidth - labelW) * 0.6) wrap.scrollLeft = todayX - labelW - (wrap.clientWidth - labelW) * 0.35;
@@ -1310,7 +1409,7 @@ function planToCsv(plan, sched) {
   }
   function tip(e, id) {
     const { it, n, when } = describe(id);
-    tipEl.innerHTML = `<b>${esc(it.label)}</b><div class="muted">${when}</div>${it.owner ? `<div>${esc(roleName(it.owner))}${roles.get(it.owner)?.person ? ` · ${esc(roles.get(it.owner).person)}` : ''}</div>` : ''}<div class="small">${n.critical ? '<span style="color:var(--crit)">Critical path</span>' : `${n.slack} day${n.slack === 1 ? '' : 's'} of slack`}${n.late ? ' · <span style="color:var(--bad)">behind schedule</span>' : ''}</div>`;
+    tipEl.innerHTML = `<b>${esc(it.label)}</b><div class="muted">${when}</div>${it.owner ? `<div>${esc(roleName(it.owner))}${roles.get(it.owner)?.person ? ` · ${esc(roles.get(it.owner).person)}` : ''}</div>` : ''}<div class="small">${n.critical ? '<span style="color:var(--crit)">Critical path</span>' : `${n.slack} day${n.slack === 1 ? '' : 's'} of slack`}${n.late && !S.tracking ? ' · <span style="color:var(--bad)">behind schedule</span>' : ''}${n.delta ? ` · <span class="${n.delta > 0 ? 'bad' : 'ok'}">${n.delta > 0 ? '+' : '−'}${Math.abs(n.delta)}d vs baseline</span>` : ''}${n.behind ? ' · <span class="bad">behind pace</span>' : ''}</div>`;
     tipEl.classList.add('on');
     positionTip(e);
   }
@@ -1362,6 +1461,10 @@ function planToCsv(plan, sched) {
         ${it.phase ? `<dt>Phase</dt><dd><span class="dot" style="background:${phaseColor(it.phase)}"></span> ${esc(phases[phaseIdx.get(it.phase)].label)}</dd>` : ''}
         ${it.owner ? `<dt>Owner</dt><dd><button class="link" data-role="${esc(it.owner)}" title="Show all their work">${esc(roleName(it.owner))}${roles.get(it.owner)?.person ? ` · ${esc(roles.get(it.owner).person)}` : ''}</button></dd>` : ''}
         ${it.status ? `<dt>Status</dt><dd>${esc(it.status.replace('_', ' '))}${Number.isFinite(it.progress) ? ` · ${it.progress}%` : ''}</dd>` : ''}
+        ${it.actual_start || it.actual_finish ? `<dt>Actual</dt><dd>${it.actual_start ? `started ${fmt(it.actual_start)}` : ''}${it.actual_finish ? `${it.actual_start ? ', ' : ''}finished ${fmt(it.actual_finish)}` : ''}</dd>` : ''}
+        ${n.base ? `<dt>Baseline</dt><dd>${it.kind === 'milestone' ? fmt(n.base.ef) : `${fmt(n.base.es)} → ${fmt(n.base.ef)}`}${n.delta ? ` <span class="${n.delta > 0 ? 'bad' : 'ok'}">(${n.delta > 0 ? 'now ' + plural(n.delta, 'working day') + ' later' : 'now ' + plural(-n.delta, 'working day') + ' earlier'})</span>` : ' <span class="muted">(on baseline)</span>'}</dd>` : ''}
+        ${n.expected !== undefined ? `<dt>Pace</dt><dd>${n.reported}% reported, ${n.expected}% expected by today${n.behind ? ' <b class="bad">behind</b>' : ''}</dd>` : ''}
+        ${n.forecast ? `<dt>Forecast</dt><dd>${it.kind === 'task' && (it.actual_start || it.progress) ? 'Remaining work counted from today' : 'Not started yet, so it can start today at the earliest'}</dd>` : ''}
         ${it.effort_days ? `<dt>Effort</dt><dd>${it.effort_days} person-days</dd>` : ''}
         ${deliverable ? `<dt>Delivers</dt><dd>${esc(deliverable.label)}</dd>` : ''}
         <dt>Slack</dt><dd>${n.critical ? '<b style="color:var(--crit)">None. It is on the critical path</b>' : `${plural(n.slack, 'working day')}: it can finish as late as ${fmt(n.lf)} without moving the end date`}</dd>

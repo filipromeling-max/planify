@@ -28,7 +28,7 @@ planify treats a plan as a set of **dates that depend on each other**. The agent
 
 | View | What it answers |
 |---|---|
-| **Overview** | Will we make it? The finish date against the target, the tasks that set it, what is behind schedule, open decisions, and the phases drawn to scale with milestones and today. |
+| **Overview** | Will we make it? The finish date against the target and the baseline, the tasks that set it, the progress log, what is behind schedule, open decisions, and the phases drawn to scale with milestones and today. |
 | **Roadmap** | When does each thing happen, and what depends on what? A Gantt chart grouped by phase, workstream or owner, with FS/SS/FF dependencies, milestones, the critical path, Today and target lines. |
 | **Structure** | What are we delivering, and who runs it? Phase gates with exit criteria, a work breakdown structure with roll-up progress, the organisation chart and governance forums. |
 | **Team & RACI** | Who owns what? A RACI matrix with one accountable person per row, and workload by role against FTE capacity. |
@@ -52,6 +52,22 @@ Move or stretch any bar on the roadmap, with the mouse or the arrow keys. The re
 Undo, discard, or **Save adjusted plan** to download a JSON file your agent can finalize.
 
 Click any person, phase, milestone or risk and the roadmap focuses on it.
+
+### Keep it true while the project runs
+
+A plan you made in September is wrong by October. planify tracks it:
+
+```bash
+node bin/planify.mjs baseline plan.json --label "Approved at kick-off"
+node bin/planify.mjs update plan.json --summary "Week 6 status"
+```
+
+- **Baselines.** Freeze the agreed plan. Every date, milestone and the finish then show their drift: *"10 working days later than the baseline."*
+- **Actuals and forecasts.** Record `actual_start` and `actual_finish`. Unfinished work is forecast from today, so a late task pushes everything after it.
+- **Pace.** A task at 30% that should be at 100% by now is flagged *behind pace* before its end date passes.
+- **Progress log.** Each update is diffed against the last one automatically: *"Platform 5% → 30% done · Go-live moves to 15 Jan (was 7 Jan) · New risk: SSO tenant not provisioned."* The Markdown export doubles as the weekly status email.
+
+In practice you tell your agent *"UAT is done, billing is at 60%, Kim's migration slipped a week"*, and it records the update and sends you the new link.
 
 ## Install
 

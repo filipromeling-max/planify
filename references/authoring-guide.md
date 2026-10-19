@@ -173,6 +173,27 @@ Exactly one accountable role (`a`) per row, at least one responsible (`r`). Use 
 
 `total` defaults to the sum of lines. Amounts are plain numbers.
 
+## Tracking: baseline, actuals and updates
+
+These fields are written as the project runs. `baseline` and `updates` are written by the CLI, never by hand.
+
+| Field | On | Meaning |
+|---|---|---|
+| `actual_start` | task | Day work really started. Overrides the planned start and its dependencies |
+| `actual_finish` | task | Day work really finished. Implies done |
+| `achieved_on` | milestone | Day it was really reached |
+| `baseline` | plan | Frozen schedule from `planify baseline`. Its presence turns tracking on |
+| `updates` | plan | Change log from `planify update`; the newest entry keeps a snapshot used for the next diff |
+
+With a baseline present, the scheduler:
+
+- places unstarted work no earlier than today
+- extends work in progress to `today + remaining`, where remaining = duration × (1 − progress)
+- reports each item's drift against the baseline (`+5d`) and the project's finish drift
+- flags a task **behind pace** when its reported progress is 20+ points below the share of its baseline window that has elapsed
+
+Status updates should name what happened, not what should have happened. Actual dates in the future are rejected.
+
 ## Patterns by project type
 
 Starting skeletons. Rename, cut and specialise; never ship the skeleton as-is.
