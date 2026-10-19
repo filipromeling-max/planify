@@ -85,6 +85,8 @@ h1 em { font-style: normal; color: var(--accent); }
 .gm-today { position: absolute; top: 0; bottom: 0; border-left: 2px dashed var(--crit); }
 .slide { animation: slide 4.8s ease-in-out infinite; }
 @keyframes slide { 0%, 30% { transform: translateX(0); } 50%, 80% { transform: translateX(34px); } 100% { transform: translateX(0); } }
+.gm-ms.slide { animation-name: slide-ms; }
+@keyframes slide-ms { 0%, 30% { transform: translateX(0) rotate(45deg); } 50%, 80% { transform: translateX(34px) rotate(45deg); } 100% { transform: translateX(0) rotate(45deg); } }
 .verdict-float { position: absolute; left: -28px; bottom: -34px; width: min(330px, 86%); padding: 14px 16px; }
 .verdict-float .eb { font-size: 11.5px; color: var(--ink-3); }
 .verdict-float p { margin: 4px 0 0; font-size: 15px; line-height: 1.35; font-weight: 500; }
