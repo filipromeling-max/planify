@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "plan_type": "project",
+  "meta": {
+    "title": "Customer portal relaunch",
+    "subtitle": "Replace the legacy self-service portal with a new web app on the shared design system.",
+    "owner": "Head of Digital",
+    "status": "active",
+    "evidence": "illustrative",
+    "start": "2026-09-07",
+    "end": "2027-02-26",
+    "today": "2026-10-19",
+    "output": "examples/customer-portal.html",
+    "calendar": { "workdays": [1, 2, 3, 4, 5], "holidays": ["2026-12-24", "2026-12-25", "2026-12-31", "2027-01-01"] }
+  },
+  "overview": {
+    "goal": "Launch a self-service portal that resolves 60% of support requests without an agent by March 2027.",
+    "problem": "The legacy portal is unsupported, fails accessibility audits and pushes 70% of customers to the phone line.",
+    "scope": {
+      "in": ["Account, billing and case management journeys", "Migration of active customer accounts", "SSO with the corporate identity provider", "WCAG 2.2 AA compliance"],
+      "out": ["Native mobile apps", "Partner portal", "Replacing the CRM"]
+    },
+    "success_criteria": [
+      { "label": "Self-service resolution rate", "target": "≥ 60%" },
+      { "label": "Customer satisfaction (CSAT)", "target": "≥ 4.3 / 5" },
+      { "label": "Accessibility audit", "target": "0 critical findings" },
+      { "label": "Legacy portal", "target": "Decommissioned" }
+    ],
+    "assumptions": ["The design system team delivers form components by October", "CRM API rate limits allow 50 req/s"],
+    "constraints": ["Launch freeze from 18 Dec to 6 Jan", "Budget fixed at €420k"]
+  },
+  "phases": [
+    { "id": "discover", "label": "Discovery", "goal": "Validate journeys and pick the architecture.", "owner": "pm" },
+    { "id": "design", "label": "Design", "goal": "Tested prototypes for the three core journeys.", "owner": "design-lead" },
+    { "id": "build", "label": "Build", "goal": "Feature-complete portal in staging.", "owner": "tech-lead" },
+    { "id": "launch", "label": "Launch", "goal": "Customers migrated and legacy switched off.", "owner": "pm" }
+  ],
+  "workstreams": [
+    { "id": "ux", "label": "Experience", "owner": "design-lead" },
+    { "id": "eng", "label": "Engineering", "owner": "tech-lead" },
+    { "id": "data", "label": "Data & migration", "owner": "data-eng" },
+    { "id": "change", "label": "Change & support", "owner": "support-lead" }
+  ],
+  "roles": [
+    { "id": "sponsor", "label": "Sponsor", "person": "Head of Digital", "kind": "sponsor" },
+    { "id": "steerco", "label": "Steering group", "kind": "steering", "reports_to": "sponsor" },
+    { "id": "pm", "label": "Project manager", "person": "Alex", "kind": "lead", "reports_to": "steerco", "fte": 1 },
+    { "id": "design-lead", "label": "Design lead", "person": "Sam", "kind": "lead", "reports_to": "pm", "fte": 1 },
+    { "id": "tech-lead", "label": "Tech lead", "person": "Robin", "kind": "lead", "reports_to": "pm", "fte": 1 },
+    { "id": "dev-team", "label": "Dev team (4)", "kind": "team", "reports_to": "tech-lead", "fte": 4 },
+    { "id": "data-eng", "label": "Data engineer", "person": "Kim", "kind": "team", "reports_to": "tech-lead", "fte": 1 },
+    { "id": "support-lead", "label": "Support lead", "person": "Jo", "kind": "lead", "reports_to": "pm", "fte": 0.5 },
+    { "id": "security", "label": "Security office", "kind": "stakeholder" },
+    { "id": "a11y-vendor", "label": "Accessibility auditor", "org": "External", "kind": "vendor", "reports_to": "pm" }
+  ],
+  "wbs": [
+    { "id": "portal", "label": "New customer portal", "kind": "outcome" },
+    { "id": "w-research", "label": "Research & architecture", "parent": "portal", "kind": "deliverable" },
+    { "id": "w-insights", "label": "Journey insights report", "parent": "w-research", "kind": "work_package" },
+    { "id": "w-arch", "label": "Architecture decision record", "parent": "w-research", "kind": "work_package" },
+    { "id": "w-experience", "label": "Experience design", "parent": "portal", "kind": "deliverable" },
+    { "id": "w-proto", "label": "Tested prototypes", "parent": "w-experience", "kind": "work_package" },
+    { "id": "w-app", "label": "Portal application", "parent": "portal", "kind": "deliverable" },
+    { "id": "w-platform", "label": "Platform & SSO", "parent": "w-app", "kind": "work_package" },
+    { "id": "w-journeys", "label": "Account, billing, cases", "parent": "w-app", "kind": "work_package" },
+    { "id": "w-quality", "label": "Test & accessibility evidence", "parent": "w-app", "kind": "work_package" },
+    { "id": "w-transition", "label": "Transition", "parent": "portal", "kind": "deliverable" },
+    { "id": "w-migration", "label": "Migrated accounts", "parent": "w-transition", "kind": "work_package" },
+    { "id": "w-support", "label": "Support readiness", "parent": "w-transition", "kind": "work_package" }
+  ],
+  "tasks": [
+    { "id": "kickoff", "label": "Kick-off & stakeholder map", "phase": "discover", "workstream": "change", "owner": "pm", "start": "2026-09-07", "duration": 3, "status": "done", "deliverable": "w-insights" },
+    { "id": "research", "label": "Customer interviews & analytics", "phase": "discover", "workstream": "ux", "owner": "design-lead", "duration": 12, "depends_on": ["kickoff"], "status": "done", "deliverable": "w-insights", "effort_days": 18 },
+    { "id": "arch", "label": "Architecture options & ADR", "phase": "discover", "workstream": "eng", "owner": "tech-lead", "duration": 10, "depends_on": ["kickoff"], "status": "done", "deliverable": "w-arch" },
+    { "id": "proto", "label": "Prototype core journeys", "phase": "design", "workstream": "ux", "owner": "design-lead", "duration": 15, "depends_on": ["g-discovery"], "status": "in_progress", "progress": 70, "deliverable": "w-proto", "effort_days": 25 },
+    { "id": "usability", "label": "Usability testing (2 rounds)", "phase": "design", "workstream": "ux", "owner": "design-lead", "duration": 8, "depends_on": [{ "id": "proto", "type": "SS", "lag": 8 }], "status": "planned", "deliverable": "w-proto" },
+    { "id": "platform", "label": "Platform, CI/CD & SSO", "phase": "build", "workstream": "eng", "owner": "tech-lead", "duration": 15, "depends_on": ["g-discovery"], "status": "in_progress", "progress": 40, "deliverable": "w-platform", "effort_days": 40 },
+    { "id": "account", "label": "Account journey", "phase": "build", "workstream": "eng", "owner": "dev-team", "duration": 15, "depends_on": ["g-design", "platform"], "deliverable": "w-journeys", "effort_days": 45 },
+    { "id": "billing", "label": "Billing journey", "phase": "build", "workstream": "eng", "owner": "dev-team", "duration": 20, "depends_on": ["g-design", "platform"], "deliverable": "w-journeys", "effort_days": 60 },
+    { "id": "cases", "label": "Case management journey", "phase": "build", "workstream": "eng", "owner": "dev-team", "duration": 15, "depends_on": ["account"], "deliverable": "w-journeys", "effort_days": 45 },
+    { "id": "migration-design", "label": "Migration mapping & dry run", "phase": "build", "workstream": "data", "owner": "data-eng", "duration": 15, "depends_on": ["arch"], "status": "at_risk", "progress": 20, "deliverable": "w-migration" },
+    { "id": "a11y", "label": "Accessibility audit & fixes", "phase": "build", "workstream": "ux", "owner": "a11y-vendor", "duration": 10, "depends_on": ["billing", "cases"], "deliverable": "w-quality" },
+    { "id": "uat", "label": "User acceptance testing", "phase": "launch", "workstream": "eng", "owner": "pm", "duration": 10, "depends_on": ["a11y"], "deliverable": "w-quality" },
+    { "id": "training", "label": "Support team training", "phase": "launch", "workstream": "change", "owner": "support-lead", "duration": 5, "depends_on": [{ "id": "uat", "type": "SS", "lag": 3 }], "deliverable": "w-support" },
+    { "id": "migrate", "label": "Account migration waves", "phase": "launch", "workstream": "data", "owner": "data-eng", "duration": 8, "depends_on": ["g-golive", "migration-design"], "deliverable": "w-migration" },
+    { "id": "decom", "label": "Decommission legacy portal", "phase": "launch", "workstream": "eng", "owner": "tech-lead", "duration": 4, "depends_on": ["migrate"], "deliverable": "w-transition" }
+  ],
+  "milestones": [
+    { "id": "g-discovery", "label": "Discovery sign-off", "phase": "discover", "kind": "gate", "owner": "sponsor", "depends_on": ["research", "arch"], "achieved": true, "criteria": ["Journeys prioritised", "ADR approved"] },
+    { "id": "g-design", "label": "Design freeze", "phase": "design", "kind": "gate", "owner": "design-lead", "depends_on": ["proto", "usability"], "criteria": ["SUS ≥ 75 in round 2"] },
+    { "id": "g-golive", "label": "Go-live", "phase": "launch", "kind": "launch", "owner": "sponsor", "depends_on": ["uat", "training"], "criteria": ["UAT passed", "0 critical a11y findings", "Support trained"] },
+    { "id": "g-close", "label": "Project close", "phase": "launch", "kind": "delivery", "owner": "pm", "depends_on": ["decom"] }
+  ],
+  "governance": {
+    "forums": [
+      { "label": "Steering group", "cadence": "Monthly", "chair": "sponsor", "members": ["pm", "tech-lead", "support-lead"], "purpose": "Scope, budget and gate decisions." },
+      { "label": "Delivery stand-up", "cadence": "Daily", "chair": "pm", "members": ["design-lead", "tech-lead", "dev-team", "data-eng"], "purpose": "Blockers and plan changes." },
+      { "label": "Design review", "cadence": "Weekly", "chair": "design-lead", "members": ["pm", "tech-lead"], "purpose": "Approve journey designs before build." }
+    ],
+    "escalation": "Stand-up → PM (same day) → Steering group (within 5 days)"
+  },
+  "raci": [
+    { "activity": "Scope and budget changes", "r": ["pm"], "a": "sponsor", "c": ["tech-lead", "design-lead"], "i": ["steerco"] },
+    { "activity": "Journey designs", "r": ["design-lead"], "a": "pm", "c": ["support-lead", "tech-lead"], "i": ["sponsor"] },
+    { "activity": "Architecture & security", "r": ["tech-lead"], "a": "tech-lead", "c": ["security"], "i": ["pm"] },
+    { "activity": "Build & test", "r": ["dev-team"], "a": "tech-lead", "c": ["design-lead"], "i": ["pm"] },
+    { "activity": "Data migration", "r": ["data-eng"], "a": "tech-lead", "c": ["support-lead", "security"], "i": ["pm"] },
+    { "activity": "Go-live decision", "r": ["pm"], "a": "sponsor", "c": ["tech-lead", "support-lead", "security"], "i": ["steerco"] }
+  ],
+  "risks": [
+    { "id": "r1", "title": "CRM API cannot handle peak load", "likelihood": 3, "impact": 5, "owner": "tech-lead", "mitigation": "Load test in sprint 2; add read cache.", "status": "mitigating", "affects": ["billing", "cases"] },
+    { "id": "r2", "title": "Migration data quality worse than sampled", "likelihood": 4, "impact": 4, "owner": "data-eng", "mitigation": "Full dry run on production copy; cleansing backlog.", "status": "open", "affects": ["migration-design", "migrate"] },
+    { "id": "r3", "title": "Design system components late", "likelihood": 3, "impact": 3, "owner": "design-lead", "mitigation": "Build local components behind the same API.", "status": "open", "affects": ["account"] },
+    { "id": "r4", "title": "Accessibility findings need rework", "likelihood": 2, "impact": 4, "owner": "design-lead", "mitigation": "Early audit of prototypes.", "affects": ["a11y"] },
+    { "id": "r5", "title": "Support team capacity during training", "likelihood": 2, "impact": 2, "owner": "support-lead", "mitigation": "Train in two cohorts." },
+    { "id": "i1", "title": "SSO tenant not provisioned yet", "type": "issue", "likelihood": 5, "impact": 3, "owner": "pm", "mitigation": "Escalated to IT; mock IdP meanwhile.", "status": "open", "affects": ["platform"] }
+  ],
+  "decisions": [
+    { "id": "d1", "title": "Phased or big-bang migration?", "owner": "sponsor", "due": "2026-11-13", "status": "open", "detail": "Phased adds 2 weeks but limits support load." },
+    { "id": "d2", "title": "Keep legacy read-only for 30 days?", "owner": "tech-lead", "due": "2027-01-15", "status": "open" }
+  ],
+  "budget": {
+    "currency": "EUR",
+    "lines": [
+      { "label": "Discovery & design", "amount": 70000, "phase": "discover" },
+      { "label": "Build team", "amount": 240000, "phase": "build" },
+      { "label": "Accessibility audit", "amount": 25000, "phase": "build" },
+      { "label": "Launch & migration", "amount": 45000, "phase": "launch" },
+      { "label": "Contingency", "amount": 40000 }
+    ]
+  }
+}

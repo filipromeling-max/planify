@@ -1,0 +1,249 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "planify/plan.schema.json",
+  "title": "Planify project plan",
+  "description": "Shape of a planify candidate. Referential rules (ids resolve, one accountable per RACI row, no cycles, dates consistent with dependencies) are enforced by lib/validate.mjs and lib/schedule.mjs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "plan_type", "meta"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "plan_type": { "const": "project" },
+    "meta": {
+      "type": "object",
+      "required": ["title", "start", "evidence"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "subtitle": { "type": "string" },
+        "owner": { "type": "string" },
+        "status": { "enum": ["draft", "proposed", "approved", "active", "on_hold", "closed"] },
+        "evidence": { "enum": ["confirmed", "illustrative"], "description": "illustrative = dates, people or amounts are placeholders." },
+        "start": { "$ref": "#/$defs/day" },
+        "end": { "$ref": "#/$defs/day", "description": "Target finish. Not used to schedule; a later scheduled finish raises plan/deadline-missed." },
+        "today": { "$ref": "#/$defs/day", "description": "Reference date for the Today line and late flags. Defaults to the render date." },
+        "version": { "type": "string" },
+        "locale": { "type": "string", "description": "BCP 47 tag for date and currency formatting." },
+        "output": { "type": "string", "description": "HTML path relative to the working directory." },
+        "quality_profile": { "enum": ["showcase", "standard"] },
+        "calendar": {
+          "type": "object",
+          "properties": {
+            "workdays": { "type": "array", "items": { "type": "integer", "minimum": 0, "maximum": 6 }, "minItems": 1, "description": "0 = Sunday … 6 = Saturday." },
+            "holidays": { "type": "array", "items": { "$ref": "#/$defs/day" } }
+          }
+        }
+      }
+    },
+    "overview": {
+      "type": "object",
+      "properties": {
+        "goal": { "type": "string" },
+        "problem": { "type": "string" },
+        "scope": {
+          "type": "object",
+          "properties": { "in": { "$ref": "#/$defs/strings" }, "out": { "$ref": "#/$defs/strings" } }
+        },
+        "success_criteria": {
+          "type": "array",
+          "items": { "type": "object", "required": ["label"], "properties": { "label": { "type": "string" }, "target": { "type": "string" } } }
+        },
+        "assumptions": { "$ref": "#/$defs/strings" },
+        "constraints": { "$ref": "#/$defs/strings" }
+      }
+    },
+    "phases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "properties": { "id": { "$ref": "#/$defs/id" }, "label": { "type": "string" }, "goal": { "type": "string" }, "owner": { "$ref": "#/$defs/id" }, "color": { "type": "string" } }
+      }
+    },
+    "workstreams": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "properties": { "id": { "$ref": "#/$defs/id" }, "label": { "type": "string" }, "owner": { "$ref": "#/$defs/id" }, "detail": { "type": "string" }, "color": { "type": "string" } }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "label": { "type": "string" },
+          "phase": { "$ref": "#/$defs/id" },
+          "workstream": { "$ref": "#/$defs/id" },
+          "owner": { "$ref": "#/$defs/id" },
+          "deliverable": { "$ref": "#/$defs/id", "description": "WBS node this task produces." },
+          "start": { "$ref": "#/$defs/day" },
+          "end": { "$ref": "#/$defs/day" },
+          "not_before": { "$ref": "#/$defs/day", "description": "Earliest allowed start; dependencies can push it later." },
+          "duration": { "type": "number", "exclusiveMinimum": 0, "description": "Working days. Use either duration or end." },
+          "depends_on": { "$ref": "#/$defs/deps" },
+          "status": { "enum": ["planned", "in_progress", "done", "blocked", "at_risk", "cancelled"] },
+          "progress": { "type": "number", "minimum": 0, "maximum": 100 },
+          "effort_days": { "type": "number", "minimum": 0 },
+          "detail": { "type": "string" }
+        }
+      }
+    },
+    "milestones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "label": { "type": "string" },
+          "phase": { "$ref": "#/$defs/id" },
+          "owner": { "$ref": "#/$defs/id" },
+          "kind": { "enum": ["gate", "delivery", "decision", "external", "launch"] },
+          "date": { "$ref": "#/$defs/day" },
+          "depends_on": { "$ref": "#/$defs/deps" },
+          "criteria": { "$ref": "#/$defs/strings" },
+          "achieved": { "type": "boolean" },
+          "detail": { "type": "string" }
+        }
+      }
+    },
+    "wbs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "label": { "type": "string" },
+          "parent": { "$ref": "#/$defs/id" },
+          "kind": { "enum": ["outcome", "deliverable", "work_package"] },
+          "owner": { "$ref": "#/$defs/id" },
+          "detail": { "type": "string" }
+        }
+      }
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "label": { "type": "string" },
+          "person": { "type": "string" },
+          "org": { "type": "string" },
+          "kind": { "enum": ["sponsor", "steering", "lead", "team", "vendor", "stakeholder"] },
+          "reports_to": { "$ref": "#/$defs/id" },
+          "fte": { "type": "number", "minimum": 0 },
+          "detail": { "type": "string" }
+        }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "properties": {
+        "forums": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["label"],
+            "properties": {
+              "label": { "type": "string" },
+              "cadence": { "type": "string" },
+              "chair": { "$ref": "#/$defs/id" },
+              "members": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+              "purpose": { "type": "string" }
+            }
+          }
+        },
+        "escalation": { "type": "string" }
+      }
+    },
+    "raci": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["activity", "a"],
+        "properties": {
+          "activity": { "type": "string" },
+          "r": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+          "a": { "$ref": "#/$defs/id", "description": "Exactly one accountable role." },
+          "c": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+          "i": { "type": "array", "items": { "$ref": "#/$defs/id" } }
+        }
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "likelihood", "impact"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "title": { "type": "string" },
+          "type": { "enum": ["risk", "issue", "assumption", "dependency"] },
+          "likelihood": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "impact": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "owner": { "$ref": "#/$defs/id" },
+          "mitigation": { "type": "string" },
+          "status": { "enum": ["open", "mitigating", "accepted", "closed"] },
+          "affects": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+          "detail": { "type": "string" }
+        }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "title": { "type": "string" },
+          "owner": { "$ref": "#/$defs/id" },
+          "due": { "$ref": "#/$defs/day" },
+          "status": { "enum": ["open", "decided", "deferred"] },
+          "blocks": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+          "detail": { "type": "string" }
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "currency": { "type": "string", "description": "ISO 4217 code, e.g. EUR, SEK, USD." },
+        "total": { "type": "number", "minimum": 0 },
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["label", "amount"],
+            "properties": { "label": { "type": "string" }, "amount": { "type": "number", "minimum": 0 }, "phase": { "$ref": "#/$defs/id" } }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+    "day": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "strings": { "type": "array", "items": { "type": "string" } },
+    "deps": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/id" },
+          {
+            "type": "object",
+            "required": ["id"],
+            "additionalProperties": false,
+            "properties": { "id": { "$ref": "#/$defs/id" }, "type": { "enum": ["FS", "SS", "FF"] }, "lag": { "type": "integer" } }
+          }
+        ]
+      }
+    }
+  }
+}

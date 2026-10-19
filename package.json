@@ -1,0 +1,23 @@
+{
+  "name": "planify",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "JSON project plans rendered as explorable standalone HTML: roadmap, WBS, organisation, RACI and risks.",
+  "license": "MIT",
+  "bin": {
+    "planify": "./bin/planify.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "examples": "for f in examples/*.plan.json; do node bin/planify.mjs finalize \"$f\" \"${f%.plan.json}.html\"; done",
+    "site": "node scripts/build-site.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/filipromeling-max/planify.git"
+  },
+  "homepage": "https://filipromeling-max.github.io/planify/"
+}

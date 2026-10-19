@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "plan_type": "project",
+  "meta": { "title": "Office move", "start": "2026-11-02", "evidence": "illustrative", "locale": "sv-SE" },
+  "tasks": [
+    { "id": "pick", "label": "Choose new office", "duration": 10 },
+    { "id": "contract", "label": "Sign lease", "duration": 5, "depends_on": ["pick"] },
+    { "id": "fitout", "label": "Fit-out", "duration": 15, "depends_on": ["contract"] },
+    { "id": "it", "label": "Network and IT setup", "duration": 5, "depends_on": [{ "id": "fitout", "type": "FF" }] }
+  ],
+  "milestones": [{ "id": "move", "label": "Moving day", "depends_on": ["it"] }]
+}
